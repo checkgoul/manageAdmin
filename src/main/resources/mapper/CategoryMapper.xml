@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nynu.goule.mapper.CategoryMapper">
+
+    <select id="queryAll" resultType="com.nynu.goule.pojo.Category" parameterType="com.nynu.goule.pojo.Category">
+        select * from categorys where parentId = #{parentId}
+    </select>
+
+    <insert id="addCategory"  parameterType="com.nynu.goule.pojo.Category">
+        insert into categorys (category_name,parentId) values (#{categoryName}, #{parentId})
+    </insert>
+
+    <update id="updateCategory" parameterType="com.nynu.goule.pojo.Category">
+        update categorys set category_name = #{categoryName} where id = #{id}
+    </update>
+
+    <select id="queryCategoryNum" resultType="int" parameterType="com.nynu.goule.pojo.Category">
+        select count(*) from categorys where category_name = #{categoryName}
+    </select>
+
+    <delete id="delCategory" parameterType="com.nynu.goule.pojo.Category">
+        delete  from categorys where id= #{id}
+    </delete>
+
+    <select id="queryCategoryNumById" resultType="int" parameterType="com.nynu.goule.pojo.Category">
+            select count(*) from categorys where id = #{id}
+    </select>
+
+    <select id="queryCategoryNumByParentId" resultType="int" parameterType="com.nynu.goule.pojo.Category">
+        select count(*) from categorys where parentId = #{parentId}
+    </select>
+</mapper>
