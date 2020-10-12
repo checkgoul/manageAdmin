@@ -1,8 +1,9 @@
 package com.nynu.goule.common;
 
+import com.nynu.goule.exception.ExceptionResponse;
 import org.springframework.web.servlet.ModelAndView;
 
-public class BaseController {
+public class BaseController extends ExceptionResponse {
     protected ModelAndView feedback() {
         return feedback(null);
     }

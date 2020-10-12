@@ -19,4 +19,26 @@
                 </if>
             </where>
     </select>
+
+    <insert id="addNewProduct" parameterType="java.util.Map">
+        INSERT INTO products (
+            `categoryId`,
+            `pCategoryId`,
+            `productname`,
+            `price`,
+            `description`,
+            `imgs`,
+            `detail`
+        )
+        VALUES
+            (
+                #{categoryId},
+                #{pCategoryId},
+                #{productName},
+                #{price},
+                #{description},
+                #{imgs},
+                #{detail}
+            )
+    </insert>
 </mapper>

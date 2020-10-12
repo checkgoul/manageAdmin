@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.security.GeneralSecurityException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -28,5 +30,24 @@ public class ProductController extends BaseController {
                                       @RequestParam(name = "productName", defaultValue = "") String productName,
                                       @RequestParam(name = "description", defaultValue = "") String description){
         return feedback(productService.queryProductByIndex(pageNum,pageSize,productName,description));
+    }
+
+    @RequestMapping("/add")
+    public ModelAndView addProduct(@RequestParam(name = "productName", defaultValue = "") String productName,
+                                   @RequestParam(name = "description", defaultValue = "") String description,
+                                   @RequestParam(name = "price", defaultValue = "") String price,
+                                   @RequestParam(name = "categoryId", defaultValue = "") String categoryId,
+                                   @RequestParam(name = "pCategoryId", defaultValue = "") String pCategoryId,
+                                   @RequestParam(name = "imgs", defaultValue = "") String imgs,
+                                   @RequestParam(name = "detail", defaultValue = "") String detail) throws GeneralSecurityException {
+        Map<String, Object> param = new HashMap<>();
+        param.put("pCategoryId",pCategoryId);
+        param.put("price",price);
+        param.put("productName",productName);
+        param.put("description",description);
+        param.put("detail",detail);
+        param.put("categoryId",categoryId);
+        param.put("imgs",imgs);
+        return feedback(productService.addNewProduct(param));
     }
 }

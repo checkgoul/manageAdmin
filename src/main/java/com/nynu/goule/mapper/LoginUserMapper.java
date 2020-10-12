@@ -9,6 +9,5 @@ import java.util.Map;
 @Mapper
 public interface LoginUserMapper {
 
-    @Select("select * from user_login where username=#{username}")
     Map<String, Object> login(String username);
 }

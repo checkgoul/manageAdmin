@@ -1,19 +1,25 @@
 package com.nynu.goule.utils;
 
+import com.nynu.goule.exception.GeneralException;
 import org.springframework.util.StringUtils;
 
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 检测map集合内某元素是否为空
+ */
 public class ValidateUtil {
 
-    public static String isBlankParam(Map<String, Object> map, String key, String name) throws GeneralSecurityException {
+    public static String isBlankParam(Map<String, Object> map, String key, String name){
         if(StringUtils.isEmpty(map.get(key))){
             if (!StringUtils.isEmpty(name)){
-                throw new GeneralSecurityException(name + "不能为空");
+                String message = name+"不能为空";
+                throw new GeneralException(message);
             }else{
-                throw new GeneralSecurityException(key + "不能为空");
+                String message = key+"不能为空";
+                throw new GeneralException(message);
             }
         }
         return String.valueOf(map.get(key));

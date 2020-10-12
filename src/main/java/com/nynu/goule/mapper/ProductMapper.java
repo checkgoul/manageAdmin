@@ -2,6 +2,7 @@ package com.nynu.goule.mapper;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nynu.goule.common.Result;
 import com.nynu.goule.pojo.Product;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -16,4 +17,5 @@ public interface ProductMapper {
 
     List<Product> queryProductByIndex(Map<String, Object> map);
 
+    int addNewProduct(Map<String, Object> map);
 }

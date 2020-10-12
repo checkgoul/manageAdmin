@@ -34,7 +34,7 @@ public class CategoryController extends BaseController {
         return feedback(categoryService.updateCategory((String)categoryMap.get("categoryName"),(int)categoryMap.get("id")));
     }
 
-    @RequestMapping("del")
+    @RequestMapping("/del")
     public ModelAndView delCategory(@RequestBody Map<String, Object> categoryMap){
         return feedback(categoryService.delCategory((int)categoryMap.get("id")));
     }
