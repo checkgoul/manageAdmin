@@ -31,4 +31,8 @@
     <select id="queryCategoryNumByParentId" resultType="int" parameterType="com.nynu.goule.pojo.Category">
         select count(*) from categorys where parentId = #{parentId}
     </select>
+
+    <select id="getCategoryNameById" parameterType="java.util.Map" resultType="com.nynu.goule.pojo.Category">
+        select category_name from categorys where id = #{id}
+    </select>
 </mapper>

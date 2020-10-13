@@ -4,6 +4,7 @@ import com.nynu.goule.pojo.Category;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CategoryMapper {
@@ -21,4 +22,6 @@ public interface CategoryMapper {
     int queryCategoryNumById(int id);
 
     int queryCategoryNumByParentId(String parentId);
+
+    Category getCategoryNameById(Map<String, Object> categoryMap);
 }

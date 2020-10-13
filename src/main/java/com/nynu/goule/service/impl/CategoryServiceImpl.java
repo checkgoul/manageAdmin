@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -99,6 +101,17 @@ public class CategoryServiceImpl implements CategoryService {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public Result categoryInfo(String id) {
+        Result result = new Result();
+        Map<String, Object> categoryMap = new HashMap<>();
+        categoryMap.put("id",Integer.valueOf(id));
+        Category category = categoryMapper.getCategoryNameById(categoryMap);
+        result.setData(category);
+        result.setStatus("0");
         return result;
     }
 }

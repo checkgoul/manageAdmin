@@ -20,6 +20,6 @@ public class LoginUserController extends BaseController {
 
     @RequestMapping("/login")
     public ModelAndView UserLogin(@RequestBody Map<String, Object> paramMap) throws Exception {
-        return feedback(loginUserService.login((String)paramMap.get("username"),(String)paramMap.get("password")));
+        return feedback(loginUserService.login(paramMap));
     }
 }

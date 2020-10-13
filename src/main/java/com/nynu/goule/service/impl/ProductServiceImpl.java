@@ -85,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
         int pNum = categoryMapper.queryCategoryNumById(Integer.valueOf(pCategoryId));
         if(num == 0 || pNum == 0){
             result.setStatus("-9999");
-            result.setMsg("填写分类不存在");
+            result.setMsg("分类不存在");
         }else {
             int count = productMapper.addNewProduct(map);
             if (count >= 1){
@@ -93,10 +93,16 @@ public class ProductServiceImpl implements ProductService {
                 result.setMsg("添加成功");
             }else{
                 result.setStatus("-9999");
-                result.setMsg("添加成功");
+                result.setMsg("添加失败");
             }
         }
         return result;
+    }
+
+    @Override
+    public Result delProduct(int id) {
+        Result result = new Result();
+        return null;
     }
 
 }

@@ -3,6 +3,7 @@ package com.nynu.goule.controller;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.nynu.goule.common.BaseController;
 import com.nynu.goule.service.CategoryService;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,5 +38,10 @@ public class CategoryController extends BaseController {
     @RequestMapping("/del")
     public ModelAndView delCategory(@RequestBody Map<String, Object> categoryMap){
         return feedback(categoryService.delCategory((int)categoryMap.get("id")));
+    }
+
+    @RequestMapping("/info")
+    public ModelAndView categoryInfo(@RequestParam(value = "categoryId") String categoryId){
+        return feedback(categoryService.categoryInfo(categoryId));
     }
 }

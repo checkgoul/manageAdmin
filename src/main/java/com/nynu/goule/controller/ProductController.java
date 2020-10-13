@@ -50,4 +50,9 @@ public class ProductController extends BaseController {
         param.put("imgs",imgs);
         return feedback(productService.addNewProduct(param));
     }
+
+    @RequestMapping("/del")
+    public ModelAndView delProduct(int id){
+        return feedback(productService.delProduct(id));
+    }
 }
