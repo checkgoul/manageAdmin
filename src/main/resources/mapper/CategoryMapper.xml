@@ -8,7 +8,7 @@
         select * from categorys where parentId = #{parentId}
     </select>
 
-    <insert id="addCategory"  parameterType="com.nynu.goule.pojo.Category">
+    <insert id="addCategory" parameterType="com.nynu.goule.pojo.Category">
         insert into categorys (category_name,parentId) values (#{categoryName}, #{parentId})
     </insert>
 
@@ -21,11 +21,11 @@
     </select>
 
     <delete id="delCategory" parameterType="com.nynu.goule.pojo.Category">
-        delete  from categorys where id= #{id}
+        delete from categorys where id= #{id}
     </delete>
 
     <select id="queryCategoryNumById" resultType="int" parameterType="com.nynu.goule.pojo.Category">
-            select count(*) from categorys where id = #{id}
+        select count(*) from categorys where id = #{id}
     </select>
 
     <select id="queryCategoryNumByParentId" resultType="int" parameterType="com.nynu.goule.pojo.Category">

@@ -5,6 +5,11 @@ public class Result {
     private String Status;
     private String msg;
 
+    public static interface RTN_CODE {
+        public static final String SUCCESS = "0";
+        public static final String ERROR = "-9999";
+    }
+
     public Object getData() {
         return data;
     }

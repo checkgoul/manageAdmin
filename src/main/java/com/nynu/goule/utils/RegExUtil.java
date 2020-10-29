@@ -26,11 +26,11 @@ public class RegExUtil {
      * 校验身份证号码
      * 通过返回true ,否则返回false
      */
-    public static boolean isCredNum(String credNum){
-        if (credNum.length() == 18){
+    public static boolean isCredNum(String credNum) {
+        if (credNum.length() == 18) {
             return Pattern.matches(REGEX_CREDNUM, credNum);
         }
-        if (credNum.length() == 15){
+        if (credNum.length() == 15) {
             return true;
         }
         return false;
@@ -40,8 +40,8 @@ public class RegExUtil {
      * 校验手机号
      * 通过返回true ,否则返回false
      */
-    public static boolean isMobile(String mobile){
-        if (mobile.length() == 11){
+    public static boolean isMobile(String mobile) {
+        if (mobile.length() == 11) {
             return Pattern.matches(REGEX_MOBILE, mobile);
         }
         return false;
@@ -51,8 +51,8 @@ public class RegExUtil {
      * 校验邮箱
      * 通过返回true ,否则返回false
      */
-    public static boolean isEmail(String email){
-        if(email.contains("@") && email.contains(".") && email.length()<51){
+    public static boolean isEmail(String email) {
+        if (email.contains("@") && email.contains(".") && email.length() < 51) {
             return Pattern.matches(REGEX_EMAIL, email);
         }
         return false;
@@ -61,11 +61,11 @@ public class RegExUtil {
     /**
      * 判断是否为汉字
      */
-    public static boolean isName(String name){
+    public static boolean isName(String name) {
         int n;
-        for(int i = 0; i< name.length(); i++){
-            n = (int)name.charAt(i);
-            if(!(19968 <= n && n<40869)){
+        for (int i = 0; i < name.length(); i++) {
+            n = (int) name.charAt(i);
+            if (!(19968 <= n && n < 40869)) {
                 return false;
             }
         }

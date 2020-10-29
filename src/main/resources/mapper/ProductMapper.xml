@@ -8,37 +8,38 @@
         select * from products
     </select>
 
-    <select id="queryProductByIndex" resultType="com.nynu.goule.pojo.Product" parameterType="com.nynu.goule.pojo.Product">
+    <select id="queryProductByIndex" resultType="com.nynu.goule.pojo.Product"
+            parameterType="com.nynu.goule.pojo.Product">
         select * from products
-            <where>
-                <if test="productName != null and productName != ''">
-                    productname like concat('%',#{productName},'%')
-                </if>
-                <if test="description != null and description != ''">
-                    and description like concat('%',#{description},'%')
-                </if>
-            </where>
+        <where>
+            <if test="productName != null and productName != ''">
+                productname like concat('%',#{productName},'%')
+            </if>
+            <if test="description != null and description != ''">
+                and description like concat('%',#{description},'%')
+            </if>
+        </where>
     </select>
 
     <insert id="addNewProduct" parameterType="java.util.Map">
         INSERT INTO products (
-            `categoryId`,
-            `pCategoryId`,
-            `productname`,
-            `price`,
-            `description`,
-            `imgs`,
-            `detail`
+        `categoryId`,
+        `pCategoryId`,
+        `productname`,
+        `price`,
+        `description`,
+        `imgs`,
+        `detail`
         )
         VALUES
-            (
-                #{categoryId},
-                #{pCategoryId},
-                #{productName},
-                #{price},
-                #{description},
-                #{imgs},
-                #{detail}
-            )
+        (
+        #{categoryId},
+        #{pCategoryId},
+        #{productName},
+        #{price},
+        #{description},
+        #{imgs},
+        #{detail}
+        )
     </insert>
 </mapper>

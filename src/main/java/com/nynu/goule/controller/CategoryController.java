@@ -21,27 +21,27 @@ public class CategoryController extends BaseController {
     private CategoryService categoryService;
 
     @RequestMapping("/all")
-    public ModelAndView queryAllCategory(@RequestParam(value = "parentId",defaultValue = "0") String parentId){
+    public ModelAndView queryAllCategory(@RequestParam(value = "parentId", defaultValue = "0") String parentId) {
         return feedback(categoryService.queryAll(parentId));
     }
 
     @RequestMapping("/add")
-    public ModelAndView addCategory(@RequestBody Map<String, Object> categoryMap){
-        return feedback(categoryService.addCategory((String)categoryMap.get("categoryName"),(String)categoryMap.get("parentId")));
+    public ModelAndView addCategory(@RequestBody Map<String, Object> categoryMap) {
+        return feedback(categoryService.addCategory((String) categoryMap.get("categoryName"), (String) categoryMap.get("parentId")));
     }
 
     @RequestMapping("/update")
-    public ModelAndView updateCategory(@RequestBody Map<String, Object> categoryMap){
-        return feedback(categoryService.updateCategory((String)categoryMap.get("categoryName"),(int)categoryMap.get("id")));
+    public ModelAndView updateCategory(@RequestBody Map<String, Object> categoryMap) {
+        return feedback(categoryService.updateCategory((String) categoryMap.get("categoryName"), (int) categoryMap.get("id")));
     }
 
     @RequestMapping("/del")
-    public ModelAndView delCategory(@RequestBody Map<String, Object> categoryMap){
-        return feedback(categoryService.delCategory((int)categoryMap.get("id")));
+    public ModelAndView delCategory(@RequestBody Map<String, Object> categoryMap) {
+        return feedback(categoryService.delCategory((int) categoryMap.get("id")));
     }
 
     @RequestMapping("/info")
-    public ModelAndView categoryInfo(@RequestParam(value = "categoryId") String categoryId){
+    public ModelAndView categoryInfo(@RequestParam(value = "categoryId") String categoryId) {
         return feedback(categoryService.categoryInfo(categoryId));
     }
 }

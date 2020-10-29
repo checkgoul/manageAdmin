@@ -16,7 +16,7 @@ public class MsgBoardController extends BaseController {
     private MsgBoardService msgBoardService;
 
     @RequestMapping("/getMsgBoard")
-    public ModelAndView getMsgBoard(){
+    public ModelAndView getMsgBoard() {
         return feedback(msgBoardService.getAllMsg());
     }
 }

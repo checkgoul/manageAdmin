@@ -20,16 +20,16 @@ public class ProductController extends BaseController {
 
     @RequestMapping("/all")
     public ModelAndView getAllProduct(@RequestParam(name = "pageNum", defaultValue = "0") Integer pageNum,
-                                      @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize){
-        return feedback(productService.getAll(pageNum,pageSize));
+                                      @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
+        return feedback(productService.getAll(pageNum, pageSize));
     }
 
     @RequestMapping("/search")
     public ModelAndView searchProduct(@RequestParam(name = "pageNum", defaultValue = "0") Integer pageNum,
                                       @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize,
                                       @RequestParam(name = "productName", defaultValue = "") String productName,
-                                      @RequestParam(name = "description", defaultValue = "") String description){
-        return feedback(productService.queryProductByIndex(pageNum,pageSize,productName,description));
+                                      @RequestParam(name = "description", defaultValue = "") String description) {
+        return feedback(productService.queryProductByIndex(pageNum, pageSize, productName, description));
     }
 
     @RequestMapping("/add")
@@ -41,18 +41,18 @@ public class ProductController extends BaseController {
                                    @RequestParam(name = "imgs", defaultValue = "") String imgs,
                                    @RequestParam(name = "detail", defaultValue = "") String detail) throws GeneralSecurityException {
         Map<String, Object> param = new HashMap<>();
-        param.put("pCategoryId",pCategoryId);
-        param.put("price",price);
-        param.put("productName",productName);
-        param.put("description",description);
-        param.put("detail",detail);
-        param.put("categoryId",categoryId);
-        param.put("imgs",imgs);
+        param.put("pCategoryId", pCategoryId);
+        param.put("price", price);
+        param.put("productName", productName);
+        param.put("description", description);
+        param.put("detail", detail);
+        param.put("categoryId", categoryId);
+        param.put("imgs", imgs);
         return feedback(productService.addNewProduct(param));
     }
 
     @RequestMapping("/del")
-    public ModelAndView delProduct(int id){
+    public ModelAndView delProduct(int id) {
         return feedback(productService.delProduct(id));
     }
 }

@@ -12,13 +12,13 @@ import java.util.Map;
  */
 public class ValidateUtil {
 
-    public static String isBlankParam(Map<String, Object> map, String key, String name){
-        if(StringUtils.isEmpty(map.get(key))){
-            if (!StringUtils.isEmpty(name)){
-                String message = name+"不能为空";
+    public static String isBlankParam(Map<String, Object> map, String key, String name) {
+        if (StringUtils.isEmpty(map.get(key))) {
+            if (!StringUtils.isEmpty(name)) {
+                String message = name + "不能为空";
                 throw new GeneralException(message);
-            }else{
-                String message = key+"不能为空";
+            } else {
+                String message = key + "不能为空";
                 throw new GeneralException(message);
             }
         }

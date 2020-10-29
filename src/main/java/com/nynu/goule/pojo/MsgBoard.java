@@ -1,5 +1,6 @@
 package com.nynu.goule.pojo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
@@ -8,8 +9,8 @@ public class MsgBoard {
     private int id;
     private String name;
     private String message;
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm")
+    private String img; // 用户头像
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     public int getId() {
@@ -42,5 +43,13 @@ public class MsgBoard {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
     }
 }

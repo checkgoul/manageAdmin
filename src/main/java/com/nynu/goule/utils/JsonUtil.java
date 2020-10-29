@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 
 /**
  * json转换工具类
- *
  */
 public class JsonUtil {
 
@@ -29,12 +28,13 @@ public class JsonUtil {
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-mm-dd HH:MM:SS"));
     }
 
-    private JsonUtil(){}
+    private JsonUtil() {
+    }
 
     /**
      * 将object对象转换为json对象
      */
-    public static String convertObject2Json(Object object){
+    public static String convertObject2Json(Object object) {
         String method = "convertObject2Json";
         try {
             return objectMapper.writeValueAsString(object);
@@ -47,7 +47,7 @@ public class JsonUtil {
     /**
      * 将json对象转换为Object
      */
-    public static Object convertJson2Object(String json, Class cls){
+    public static Object convertJson2Object(String json, Class cls) {
         String method = "convertJson2Object";
         try {
             return objectMapper.readValue(json, cls);
@@ -60,10 +60,10 @@ public class JsonUtil {
     /**
      * 将List<T>转换为List<Map<String, Object>>
      */
-    public static <T> List<Map<String, Object>> objects2Maps(List<T> objectList){
+    public static <T> List<Map<String, Object>> objects2Maps(List<T> objectList) {
         List<Map<String, Object>> list = Lists.newArrayList();
-        if(!CollectionUtils.isEmpty(objectList)) {
-            for(int i = 0, size = objectList.size(); i< size; i++){
+        if (!CollectionUtils.isEmpty(objectList)) {
+            for (int i = 0, size = objectList.size(); i < size; i++) {
                 T bean = objectList.get(i);
                 Map<String, Object> map = bean2Map(bean);
                 list.add(map);
@@ -77,9 +77,9 @@ public class JsonUtil {
      */
     public static <T> Map<String, Object> bean2Map(T bean) {
         Map<String, Object> map = Maps.newHashMap();
-        if(bean != null) {
+        if (bean != null) {
             BeanMap beanMap = BeanMap.create(bean);
-            for(Object key : beanMap.keySet()){
+            for (Object key : beanMap.keySet()) {
                 map.put(key + "", beanMap.get(key));
             }
         }

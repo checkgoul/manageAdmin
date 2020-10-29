@@ -36,11 +36,11 @@ public class ProductServiceImpl implements ProductService {
         PageHelper.startPage(pageNum, pageSize);
         List<Product> products = productMapper.getAll();
         PageInfo<Product> pageInfo = new PageInfo<>(products);
-        if(!StringUtils.isEmpty(pageInfo)){
+        if (!StringUtils.isEmpty(pageInfo)) {
             result.setData(pageInfo);
-            result.setStatus("0");
-        }else {
-            result.setStatus("-9999");
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+        } else {
+            result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg("查询失败");
         }
         return result;
@@ -50,19 +50,21 @@ public class ProductServiceImpl implements ProductService {
     public Result queryProductByIndex(int pageNum, int pageSize, String productName, String description) {
         Result result = new Result();
         Map<String, Object> param = new HashMap<>();
-        param.put("productName",productName);
-        param.put("description",description);
-        param.put("pageNum",pageNum);
-        param.put("pageSize",pageSize);
+        String productName1 = productName.replace(" ",""); // 对搜索框去空格处理
+        String description1 = description.replace(" ","");
+        param.put("productName", productName1);
+        param.put("description", description1);
+        param.put("pageNum", pageNum);
+        param.put("pageSize", pageSize);
         PageHelper.startPage(pageNum, pageSize);
         List<Product> products = productMapper.queryProductByIndex(param);
         PageInfo<Product> pageInfo = new PageInfo<>(products);
-        if(!StringUtils.isEmpty(pageInfo)){
+        if (!(products.size() == 0)) {
             result.setData(pageInfo);
-            result.setStatus("0");
-        }else {
-            result.setStatus("-9999");
-            result.setMsg("查询失败");
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+        } else {
+            result.setStatus(Result.RTN_CODE.ERROR);
+            result.setMsg("暂无该商品");
         }
         return result;
     }
@@ -72,27 +74,27 @@ public class ProductServiceImpl implements ProductService {
      * @return
      */
     @Override
-    public Result addNewProduct(Map<String, Object> map){
+    public Result addNewProduct(Map<String, Object> map) {
         Result result = new Result();
-        String pCategoryId = (String) ValidateUtil.isBlankParam(map,"pCategoryId","父分类"); //所在父分类
+        String pCategoryId = (String) ValidateUtil.isBlankParam(map, "pCategoryId", "父分类"); //所在父分类
         String price = (String) map.get("price"); //价格
-        String productName = (String) ValidateUtil.isBlankParam(map,"productName","产品名"); //产品名称
+        String productName = (String) ValidateUtil.isBlankParam(map, "productName", "产品名"); //产品名称
         String description = (String) map.get("description"); //产品描述
         String detail = (String) map.get("detail"); //产品详情
-        String categoryId = (String) ValidateUtil.isBlankParam(map,"categoryId","分类"); //所在分类
+        String categoryId = (String) ValidateUtil.isBlankParam(map, "categoryId", "分类"); //所在分类
         String imgs = (String) map.get("imgs"); //产品图片 --/暂不可用
         int num = categoryMapper.queryCategoryNumById(Integer.valueOf(categoryId));
         int pNum = categoryMapper.queryCategoryNumById(Integer.valueOf(pCategoryId));
-        if(num == 0 || pNum == 0){
-            result.setStatus("-9999");
+        if (num == 0 || pNum == 0) {
+            result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg("分类不存在");
-        }else {
+        } else {
             int count = productMapper.addNewProduct(map);
-            if (count >= 1){
-                result.setStatus("0");
+            if (count >= 1) {
+                result.setStatus(Result.RTN_CODE.SUCCESS);
                 result.setMsg("添加成功");
-            }else{
-                result.setStatus("-9999");
+            } else {
+                result.setStatus(Result.RTN_CODE.ERROR);
                 result.setMsg("添加失败");
             }
         }

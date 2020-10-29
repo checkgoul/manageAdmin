@@ -4,7 +4,7 @@ public class SystemMessage {
     private String Status;
     private String msg;
 
-    public SystemMessage(String Status, String msg){
+    public SystemMessage(String Status, String msg) {
         super();
         this.Status = Status;
         this.msg = msg;

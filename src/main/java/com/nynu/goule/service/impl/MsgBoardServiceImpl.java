@@ -18,7 +18,7 @@ public class MsgBoardServiceImpl implements MsgBoardService {
     @Override
     public Result getAllMsg() {
         Result result = new Result();
-        List<MsgBoard> msgBoardList =  msgBoardMapper.getAllMsg();
+        List<MsgBoard> msgBoardList = msgBoardMapper.getAllMsg();
         result.setData(msgBoardList);
         result.setStatus("0");
         return result;
