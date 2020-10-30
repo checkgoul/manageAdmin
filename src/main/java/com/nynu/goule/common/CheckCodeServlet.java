@@ -15,7 +15,7 @@ import java.io.OutputStream;
 @RequestMapping("/img")
 public class CheckCodeServlet {
 
-    @RequestMapping("/getVerifyCode")
+    @RequestMapping("/{params}")
     public void getVerificationCode(HttpServletResponse response, HttpServletRequest request) {
         try {
             int width=200;

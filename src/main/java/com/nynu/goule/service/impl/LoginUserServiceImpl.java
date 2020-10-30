@@ -1,6 +1,7 @@
 package com.nynu.goule.service.impl;
 
 import com.nynu.goule.common.Result;
+import com.nynu.goule.exception.GeneralException;
 import com.nynu.goule.mapper.LoginUserMapper;
 import com.nynu.goule.pojo.LoginUser;
 import com.nynu.goule.service.LoginUserService;
@@ -28,10 +29,15 @@ public class LoginUserServiceImpl implements LoginUserService {
     public Result login(Map<String, Object> paramMap,HttpServletRequest request) throws Exception {
         Result result = new Result();
         String username = ValidateUtil.isBlankParam(paramMap, "username", "用户名");
-        String password = ValidateUtil.isBlankParam(paramMap, "username", "密码");
+        String password = ValidateUtil.isBlankParam(paramMap, "password", "密码");
         String verification1 = ValidateUtil.isBlankParam(paramMap, "verification", "验证码");
         // 从session中取验证码
         String checkCode1 = (String) request.getSession().getAttribute("verifyCode");
+        if(StringUtil.isEmpty(checkCode1)) {
+            result.setStatus(Result.RTN_CODE.ERROR);
+            result.setMsg("请重新获取验证码!");
+            return result;
+        }
         //统一对字母转小写处理,防止对比失败
         String verification = verification1.toLowerCase();
         String checkCode = checkCode1.toLowerCase();
@@ -45,13 +51,9 @@ public class LoginUserServiceImpl implements LoginUserService {
             if (!CollectionUtils.isEmpty(rtnMap) && rtnMap.size() > 0) {
                 realPwd = (String) rtnMap.get("password");
             }
-            if (realPwd == null || "".equals(realPwd)) {
+            if (realPwd == null || "".equals(realPwd) || !password.equals(realPwd)) {
                 result.setStatus(Result.RTN_CODE.ERROR);
-                result.setMsg("没有该用户!");
-                return result;
-            } else if (!password.equals(realPwd)) {
-                result.setStatus(Result.RTN_CODE.ERROR);
-                result.setMsg("密码错误!");
+                result.setMsg("账号或密码错误");
                 return result;
             }
             result.setStatus(Result.RTN_CODE.SUCCESS);
