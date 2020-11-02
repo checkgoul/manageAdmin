@@ -42,4 +42,9 @@
         #{detail}
         )
     </insert>
+
+
+    <select id="queryCategoryChildNumByParentId" resultType="int" parameterType="com.nynu.goule.pojo.Category">
+        select count(*) from products where categoryId = #{parentId}
+    </select>
 </mapper>

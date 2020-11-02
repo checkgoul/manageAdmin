@@ -18,4 +18,6 @@ public interface ProductMapper {
     List<Product> queryProductByIndex(Map<String, Object> map);
 
     int addNewProduct(Map<String, Object> map);
+
+    int queryCategoryChildNumByParentId(String parentId);
 }

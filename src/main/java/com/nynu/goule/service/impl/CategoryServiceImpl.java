@@ -2,8 +2,12 @@ package com.nynu.goule.service.impl;
 
 import com.nynu.goule.common.Result;
 import com.nynu.goule.mapper.CategoryMapper;
+import com.nynu.goule.mapper.ProductMapper;
 import com.nynu.goule.pojo.Category;
+import com.nynu.goule.pojo.OperateLog;
 import com.nynu.goule.service.CategoryService;
+import com.nynu.goule.service.OperateLogService;
+import com.nynu.goule.utils.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Resource
     private CategoryMapper categoryMapper;
+    @Resource
+    private ProductMapper productMapper;
+    @Resource
+    private OperateLogService operateLogService;
 
     @Override
     public Result queryAll(String parentId) {
@@ -80,26 +88,39 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Result delCategory(int id) {
         Result result = new Result();
+        Map<String ,Object> operateMap = new HashMap<>();
         int num = categoryMapper.queryCategoryNumById(id);
         if (num <= 0) {
             result.setMsg("删除失败");
             result.setStatus("-9999");
+            return result;
         } else {
             String parentId = Integer.toString(id);
-            int secondCategoryNum = categoryMapper.queryCategoryNumByParentId(parentId);
-            if (secondCategoryNum >= 1) {
+            int secondCategoryNum = categoryMapper.queryCategoryNumByParentId(parentId); // 父集下存在子集
+            int categoryChildNum = productMapper.queryCategoryChildNumByParentId(parentId); // 子集下存在商品
+            if (secondCategoryNum >= 1 || categoryChildNum >= 1) {
                 result.setMsg("存在子分类,不可删除");
                 result.setStatus("-9999");
+                return result;
             } else {
                 int count = categoryMapper.delCategory(id);
                 if (count >= 1) {
                     result.setMsg("删除成功");
                     result.setStatus("0");
+                    String msg = "删除id="+id+"的商品";
+                    operateMap.put("acctId","admin");
+                    operateMap.put("opType", OperateLog.OP_TYPE.DELETE);
+                    operateMap.put("logCntt",msg);
+                    operateMap.put("beforeCntt",id);
                 } else {
                     result.setMsg("删除失败");
                     result.setStatus("-9999");
+                    return result;
                 }
             }
+        }
+        if(operateMap.size() > 0){
+            operateLogService.addOperateLog(operateMap);
         }
         return result;
     }

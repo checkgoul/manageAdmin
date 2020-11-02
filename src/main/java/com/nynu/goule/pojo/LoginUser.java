@@ -5,6 +5,7 @@ public class LoginUser {
     private int id;
     private String username;
     private String password;
+    private String accountName;
 
     public int getId() {
         return id;
@@ -28,5 +29,13 @@ public class LoginUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }
