@@ -24,4 +24,6 @@ public interface CategoryMapper {
     int queryCategoryNumByParentId(String parentId);
 
     Category getCategoryNameById(Map<String, Object> categoryMap);
+
+    Category getCategoryParentIdById(Map<String, Object> categoryMap);
 }

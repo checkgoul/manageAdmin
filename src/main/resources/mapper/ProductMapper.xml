@@ -47,4 +47,8 @@
     <select id="queryCategoryChildNumByParentId" resultType="int" parameterType="com.nynu.goule.pojo.Category">
         select count(*) from products where categoryId = #{parentId}
     </select>
+
+    <update id="updateStatusById" parameterType="java.util.Map" >
+        update products set productstatus = #{productStatus} where id =#{id}
+    </update>
 </mapper>

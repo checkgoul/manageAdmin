@@ -7,11 +7,11 @@ import java.util.Map;
 public interface CategoryService {
     Result queryAll(String parentId);
 
-    Result addCategory(String categoryName, String parentId);
+    Result addCategory(Map<String, Object> categoryMap);
 
-    Result updateCategory(String categoryName, int id);
+    Result updateCategory(Map<String, Object> categoryMap);
 
-    Result delCategory(int id);
+    Result delCategory(Map<String, Object> categoryMap);
 
     Result categoryInfo(String id);
 }

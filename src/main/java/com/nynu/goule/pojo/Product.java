@@ -12,7 +12,7 @@ public class Product {
     private String productName;
     private String price;
     private String description;
-    private int productStatus;
+    private int productStatus;  //1:在售0:下线
     private String imgs;
     private String detail;
 

@@ -16,4 +16,6 @@ public interface ProductService {
     Result addNewProduct(Map<String, Object> map) throws GeneralSecurityException;
 
     Result delProduct(int id);
+
+    Result updateStatus(Map<String, Object> map);
 }

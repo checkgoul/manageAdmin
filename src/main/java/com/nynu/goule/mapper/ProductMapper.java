@@ -20,4 +20,6 @@ public interface ProductMapper {
     int addNewProduct(Map<String, Object> map);
 
     int queryCategoryChildNumByParentId(String parentId);
+
+    int updateStatusById(Map<String, Object> param);
 }

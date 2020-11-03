@@ -27,17 +27,17 @@ public class CategoryController extends BaseController {
 
     @RequestMapping("/add")
     public ModelAndView addCategory(@RequestBody Map<String, Object> categoryMap) {
-        return feedback(categoryService.addCategory((String) categoryMap.get("categoryName"), (String) categoryMap.get("parentId")));
+        return feedback(categoryService.addCategory(categoryMap));
     }
 
     @RequestMapping("/update")
     public ModelAndView updateCategory(@RequestBody Map<String, Object> categoryMap) {
-        return feedback(categoryService.updateCategory((String) categoryMap.get("categoryName"), (int) categoryMap.get("id")));
+        return feedback(categoryService.updateCategory(categoryMap));
     }
 
     @RequestMapping("/del")
     public ModelAndView delCategory(@RequestBody Map<String, Object> categoryMap) {
-        return feedback(categoryService.delCategory((int) categoryMap.get("id")));
+        return feedback(categoryService.delCategory(categoryMap));
     }
 
     @RequestMapping("/info")

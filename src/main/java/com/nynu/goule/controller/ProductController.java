@@ -55,4 +55,9 @@ public class ProductController extends BaseController {
     public ModelAndView delProduct(int id) {
         return feedback(productService.delProduct(id));
     }
+
+    @RequestMapping("/updateStatus")
+    public ModelAndView updateStatus(@RequestBody Map<String, Object> map){
+        return feedback(productService.updateStatus(map));
+    }
 }

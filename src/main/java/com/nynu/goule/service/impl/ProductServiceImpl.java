@@ -107,4 +107,26 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
+    @Override
+    public Result updateStatus(Map<String, Object> map) {
+        Result result = new Result();
+        Map<String, Object> param = new HashMap<>();
+        param.put("id",map.get("id"));
+        param.put("productStatus",map.get("productStatus"));
+        int successNum = productMapper.updateStatusById(param);
+        if(successNum > 0){
+            if(((int)param.get("productStatus") == 1)){
+                result.setMsg("上架成功");
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+            }else {
+                result.setMsg("下架成功");
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+            }
+        }else{
+            result.setMsg("更新失败");
+            result.setStatus(Result.RTN_CODE.ERROR);
+        }
+        return result;
+    }
+
 }
