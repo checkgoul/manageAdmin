@@ -22,6 +22,17 @@ public class RegExUtil {
      */
     public static final String REGEX_CREDNUM = "^[1-9]\\d{5}[1-9]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{4}$";
 
+    //检查身份证是否合法 验证时请先验证长度是否为15为或者18位
+    public static final String IDCARD = "\\d{6}(19|20)*[0-99]{2}(0[1-9]{1}|10|11|12)(0[1-9]{1}|1[0-9]|2[0-9]|30|31)(\\w*)";
+    // 检查护照是否合法
+    public static final String PASSPORT1 = "/^[a-zA-Z]{5,17}$/";
+    public static final String PASSPORT2 = "/^[a-zA-Z0-9]{5,17}$/";
+    // 港澳通行证验证
+    public static final String HKMAKAO = "/^[HMhm]{1}([0-9]{10}|[0-9]{8})$/";
+    //  台湾通行证验证
+    public static final String TAIWAN1 = " /^[0-9]{8}$/";
+    public static final String TAIWAN2 = "/^[0-9]{10}$/";
+
     /**
      * 校验身份证号码
      * 通过返回true ,否则返回false

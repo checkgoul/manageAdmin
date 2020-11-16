@@ -8,9 +8,9 @@ public class BaseController extends ExceptionResponse {
         return feedback(null);
     }
 
-    protected ModelAndView feedback(Result obj) {
-        Object result = obj != null ? obj : "success";
-        return new ModelAndView(new JsonView(result));
+    protected ModelAndView feedback(Result result) {
+        Object obj = result != null ? result : "success";
+        return new ModelAndView(new JsonView(obj));
     }
 
     /*protected static <T> T parseModel(String modelJSON, T model) throws ServiceException {

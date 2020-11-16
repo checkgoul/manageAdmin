@@ -67,6 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
                     }
                     operateMap.put("acctId",mainAcctId);
                     operateMap.put("opType",OperateLog.OP_TYPE.ADD);
+                    operateMap.put("opMenu",OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
                     operateMap.put("afterCntt",categoryName);
                     operateLogService.addOperateLog(operateMap);
                 } else {
@@ -108,6 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
                 operateMap.put("acctId",mainAcctId);
                 operateMap.put("opType",OperateLog.OP_TYPE.MODIFY);
                 operateMap.put("logCntt",msg);
+                operateMap.put("opMenu",OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
                 operateMap.put("beforeCntt",beforeCategoryName);
                 operateMap.put("afterCntt",categoryName);
                 operateLogService.addOperateLog(operateMap);
@@ -160,6 +162,7 @@ public class CategoryServiceImpl implements CategoryService {
                     }
                     operateMap.put("acctId",mainAcctId);
                     operateMap.put("opType", OperateLog.OP_TYPE.DELETE);
+                    operateMap.put("opMenu",OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
                     operateMap.put("beforeCntt",beforeCategoryName);
                 } else {
                     result.setMsg("删除失败");

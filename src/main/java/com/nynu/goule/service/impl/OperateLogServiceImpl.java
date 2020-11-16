@@ -1,18 +1,17 @@
 package com.nynu.goule.service.impl;
 
+import com.nynu.goule.common.Result;
 import com.nynu.goule.exception.GeneralException;
 import com.nynu.goule.mapper.OperateLogMapper;
 import com.nynu.goule.pojo.OperateLog;
 import com.nynu.goule.service.OperateLogService;
+import com.nynu.goule.utils.DateUtil;
 import com.nynu.goule.utils.ValidateUtil;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.RegEx;
 import javax.annotation.Resource;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 public class OperateLogServiceImpl implements OperateLogService {
@@ -26,6 +25,7 @@ public class OperateLogServiceImpl implements OperateLogService {
         String acctId = ValidateUtil.isBlankParam(param,"acctId","主账号");
         String opType = ValidateUtil.isBlankParam(param,"opType","操作类型");
         String logCntt = ValidateUtil.isBlankParam(param,"logCntt","操作内容");
+        Timestamp time = DateUtil.getCurrentTimestamp();
         Map<String, Object> operateMap = new HashMap<>();
         try {
             UUID uuid = UUID.randomUUID();
@@ -40,10 +40,23 @@ public class OperateLogServiceImpl implements OperateLogService {
         operateMap.put("acctId",acctId);
         operateMap.put("opType",opType);
         operateMap.put("logCntt",logCntt);
+        operateMap.put("opMenu",param.get("opMenu"));
         operateMap.put("Year",getYearAndMonth());
         operateMap.put("beforeCntt",param.get("beforeCntt"));
         operateMap.put("afterCntt",param.get("afterCntt"));
+        operateMap.put("opTime",time);
         operateLogMapper.addOperateLog(operateMap);
+    }
+
+    @Override
+    public Result getOperateLog() {
+        Result result = new Result();
+        Map<String, Object> map = new HashMap<>();
+        map.put("Year",getYearAndMonth());
+        List<OperateLog> operateLogList = operateLogMapper.getAllOperateLog(map);
+        result.setData(operateLogList);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
     }
 
     public static String getYearAndMonth(){
