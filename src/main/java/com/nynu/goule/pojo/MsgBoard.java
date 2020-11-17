@@ -7,11 +7,11 @@ import java.util.Date;
 
 public class MsgBoard {
     private int id;
-    private String name;
-    private String message;
-    private String img; // 用户头像
+    private String author;
+    private String content;
+    private String avatar; // 用户头像
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date datetime;
 
     public int getId() {
         return id;
@@ -21,35 +21,35 @@ public class MsgBoard {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    public String getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
-    public String getImg() {
-        return img;
+    public Date getDatetime() {
+        return datetime;
     }
 
-    public void setImg(String img) {
-        this.img = img;
+    public void setDatetime(Date datetime) {
+        this.datetime = datetime;
     }
 }

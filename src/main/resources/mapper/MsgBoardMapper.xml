@@ -5,6 +5,6 @@
 <mapper namespace="com.nynu.goule.mapper.MsgBoardMapper">
 
     <select id="getAllMsg" parameterType="java.util.Map" resultType="com.nynu.goule.pojo.MsgBoard">
-        select * from message_board
+        select * from message_board ORDER BY datetime DESC
     </select>
 </mapper>
