@@ -51,4 +51,8 @@
     <update id="updateStatusById" parameterType="java.util.Map" >
         update products set productstatus = #{productStatus} where id =#{id}
     </update>
+
+    <select id="getProductInfoById" parameterType="java.util.Map" resultType="java.util.Map">
+        select * from products where id = #{id}
+    </select>
 </mapper>

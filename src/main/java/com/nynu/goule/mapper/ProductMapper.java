@@ -22,4 +22,6 @@ public interface ProductMapper {
     int queryCategoryChildNumByParentId(String parentId);
 
     int updateStatusById(Map<String, Object> param);
+
+    Map<String, Object> getProductInfoById(Map<String, Object> map);
 }

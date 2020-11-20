@@ -5,7 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.nynu.goule.common.Result;
 import com.nynu.goule.mapper.CategoryMapper;
 import com.nynu.goule.mapper.ProductMapper;
+import com.nynu.goule.pojo.OperateLog;
 import com.nynu.goule.pojo.Product;
+import com.nynu.goule.service.OperateLogService;
 import com.nynu.goule.service.ProductService;
 import com.nynu.goule.utils.StringUtil;
 import com.nynu.goule.utils.ValidateUtil;
@@ -27,6 +29,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductMapper productMapper;
     @Resource
     private CategoryMapper categoryMapper;
+    @Resource
+    private OperateLogService operateLogService;
 
     @Override
     public Result getAll(int pageNum, int pageSize) {
@@ -110,7 +114,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Result updateStatus(Map<String, Object> map) {
         Result result = new Result();
+        Map<String, Object> operateMap = new HashMap<>();
         Map<String, Object> param = new HashMap<>();
+        String beforeStatus = "";
+        String afterStatus = "";
         param.put("id",map.get("id"));
         param.put("productStatus",map.get("productStatus"));
         int successNum = productMapper.updateStatusById(param);
@@ -118,10 +125,23 @@ public class ProductServiceImpl implements ProductService {
             if(((int)param.get("productStatus") == 1)){
                 result.setMsg("上架成功");
                 result.setStatus(Result.RTN_CODE.SUCCESS);
+                beforeStatus = "下架";
+                afterStatus = "上架";
             }else {
                 result.setMsg("下架成功");
                 result.setStatus(Result.RTN_CODE.SUCCESS);
+                beforeStatus = "上架";
+                afterStatus = "下架";
             }
+            Map<String, Object> productInfoMap = productMapper.getProductInfoById(map);
+            String productMsg = "更新商品“" + productInfoMap.get("productname") +"”状态";
+            operateMap.put("acctId",map.get("account_name"));
+            operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
+            operateMap.put("logCntt",productMsg);
+            operateMap.put("opMenu",OperateLog.OP_PATH.PRODUCT_MANAGEMENT);
+            operateMap.put("beforeCntt",beforeStatus);
+            operateMap.put("afterCntt",afterStatus);
+            operateLogService.addOperateLog(operateMap);
         }else{
             result.setMsg("更新失败");
             result.setStatus(Result.RTN_CODE.ERROR);

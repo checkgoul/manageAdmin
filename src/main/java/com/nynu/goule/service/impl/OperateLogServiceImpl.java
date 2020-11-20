@@ -1,5 +1,8 @@
 package com.nynu.goule.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.nynu.goule.common.Result;
 import com.nynu.goule.exception.GeneralException;
 import com.nynu.goule.mapper.OperateLogMapper;
@@ -36,25 +39,47 @@ public class OperateLogServiceImpl implements OperateLogService {
         if(!(OperateLog.OP_TYPE.ADD.equals(opType)) && !(OperateLog.OP_TYPE.MODIFY.equals(opType)) && !(OperateLog.OP_TYPE.DELETE.equals(opType))){
             throw new GeneralException("操作类型错误!");
         }
-        operateMap.put("logId",logId);
+        operateMap.put("logId",logId); //
         operateMap.put("acctId",acctId);
         operateMap.put("opType",opType);
         operateMap.put("logCntt",logCntt);
         operateMap.put("opMenu",param.get("opMenu"));
-        operateMap.put("Year",getYearAndMonth());
+        operateMap.put("Year",getYearAndMonth()); //
         operateMap.put("beforeCntt",param.get("beforeCntt"));
         operateMap.put("afterCntt",param.get("afterCntt"));
-        operateMap.put("opTime",time);
+        operateMap.put("opTime",time); //
         operateLogMapper.addOperateLog(operateMap);
     }
 
     @Override
-    public Result getOperateLog() {
+    public Result getOperateLog(int pageNum, int pageSize) {
         Result result = new Result();
+        pageNum = pageNum == 1 ? 1 : pageNum;
+        pageSize = pageSize == 0 ? 8 : pageSize;
+        PageHelper.startPage(pageNum, pageSize);
         Map<String, Object> map = new HashMap<>();
         map.put("Year",getYearAndMonth());
         List<OperateLog> operateLogList = operateLogMapper.getAllOperateLog(map);
-        result.setData(operateLogList);
+        PageInfo<OperateLog> operateLogPageInfo = new PageInfo<>(operateLogList);
+        result.setData(operateLogPageInfo);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Result searchInfoByAny(Integer pageNum, Integer pageSize, String searchName, String opType, String opMenu) {
+        Result result = new Result();
+        Map<String, Object> searchMap = new HashMap<>();
+        pageNum = pageNum == 1 ? 1 : pageNum;
+        pageSize = pageSize == 0 ? 8 : pageSize;
+        PageHelper.startPage(pageNum, pageSize);
+        searchMap.put("searchName", searchName);
+        searchMap.put("opType", opType);
+        searchMap.put("opMenu", opMenu);
+        searchMap.put("Year",getYearAndMonth());
+        List<OperateLog> searchInfoList = operateLogMapper.searchInfoByAny(searchMap);
+        PageInfo<OperateLog> operateLogPageInfo = new PageInfo<>(searchInfoList);
+        result.setData(operateLogPageInfo);
         result.setStatus(Result.RTN_CODE.SUCCESS);
         return result;
     }

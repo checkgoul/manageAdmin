@@ -10,4 +10,6 @@ public interface OperateLogMapper {
     void addOperateLog(Map<String, Object> map);
 
     List<OperateLog> getAllOperateLog(Map<String, Object> map);
+
+    List<OperateLog> searchInfoByAny(Map<String, Object> searchMap);
 }

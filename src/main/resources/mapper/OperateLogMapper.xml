@@ -46,6 +46,37 @@
             AFTERCNTT afterCntt,
             OPTIME opTime
             from operatelog${Year}
-            ORDER BY ADDTIME desc
+            ORDER BY opTime desc
+    </select>
+
+    <select id="searchInfoByAny" resultType="com.nynu.goule.pojo.OperateLog" parameterType="java.util.Map">
+        select
+            LOGID logId,
+            ACCTID acctId,
+            (CASE WHEN OPTYPE = '1' THEN '新增'
+            WHEN OPTYPE = '2' THEN '修改'
+            WHEN OPTYPE = '3' THEN '删除'
+            END ) AS OPTYPE,
+            (CASE WHEN OPMENU = 'CATEGORY_MANAGEMENT' THEN '品类管理'
+            WHEN OPMENU = 'PRODUCT_MANAGEMENT' THEN '商品管理'
+            WHEN OPMENU = 'USER_MANAGEMENT' THEN '用户管理'
+            WHEN OPMENU = 'ROLE_MANAGEMENT' THEN '角色管理'
+            END ) AS OPMENU,
+            LOGCNTT logCntt,
+            BEFORECNTT beforeCntt,
+            AFTERCNTT afterCntt,
+            OPTIME opTime from operatelog${Year}
+        <where>
+            <if test="searchName != null and searchName != ''">
+                ACCTID like concat('%',#{searchName},'%')
+            </if>
+            <if test="opType != null and opType != ''">
+                AND OPTYPE = #{opType}
+            </if>
+            <if test="opMenu != null and opMenu != ''">
+                AND OPMENU = #{opMenu}
+            </if>
+        </where>
+        ORDER BY opTime desc
     </select>
 </mapper>
