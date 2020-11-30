@@ -1,5 +1,6 @@
 package com.nynu.goule.pojo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,6 +16,8 @@ public class Product {
     private int productStatus;  //1:在售0:下线
     private String imgs;
     private String detail;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date addTime;
 
     public int getId() {
         return id;
@@ -86,5 +89,13 @@ public class Product {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

@@ -1,15 +1,18 @@
 package com.nynu.goule.controller;
 
 import com.nynu.goule.common.BaseController;
-import com.nynu.goule.common.Result;
 import com.nynu.goule.service.ProductService;
+import com.nynu.goule.utils.OSSUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/manage/product")
@@ -33,22 +36,8 @@ public class ProductController extends BaseController {
     }
 
     @RequestMapping("/add")
-    public ModelAndView addProduct(@RequestParam(name = "productName", defaultValue = "") String productName,
-                                   @RequestParam(name = "description", defaultValue = "") String description,
-                                   @RequestParam(name = "price", defaultValue = "") String price,
-                                   @RequestParam(name = "categoryId", defaultValue = "") String categoryId,
-                                   @RequestParam(name = "pCategoryId", defaultValue = "") String pCategoryId,
-                                   @RequestParam(name = "imgs", defaultValue = "") String imgs,
-                                   @RequestParam(name = "detail", defaultValue = "") String detail) throws GeneralSecurityException {
-        Map<String, Object> param = new HashMap<>();
-        param.put("pCategoryId", pCategoryId);
-        param.put("price", price);
-        param.put("productName", productName);
-        param.put("description", description);
-        param.put("detail", detail);
-        param.put("categoryId", categoryId);
-        param.put("imgs", imgs);
-        return feedback(productService.addNewProduct(param));
+    public ModelAndView addProduct(@RequestBody Map<String, Object> map) throws GeneralSecurityException {
+        return feedback(productService.addNewProduct(map));
     }
 
     @RequestMapping("/del")
@@ -60,4 +49,16 @@ public class ProductController extends BaseController {
     public ModelAndView updateStatus(@RequestBody Map<String, Object> map){
         return feedback(productService.updateStatus(map));
     }
+
+    @RequestMapping("/uploadImages")
+    public ModelAndView uploadImages(MultipartFile file) throws IOException {
+        //MultipartFile file = (MultipartFile) map.get("image");
+        return feedback(productService.uploadImages(file));
+    }
+
+    @RequestMapping("/delImages")
+    public ModelAndView delImages(){
+        return feedback();
+    }
+
 }

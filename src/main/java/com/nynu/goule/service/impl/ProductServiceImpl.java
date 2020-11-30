@@ -1,5 +1,6 @@
 package com.nynu.goule.service.impl;
 
+import com.nynu.goule.utils.OSSUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nynu.goule.common.Result;
@@ -9,17 +10,16 @@ import com.nynu.goule.pojo.OperateLog;
 import com.nynu.goule.pojo.Product;
 import com.nynu.goule.service.OperateLogService;
 import com.nynu.goule.service.ProductService;
-import com.nynu.goule.utils.StringUtil;
+import com.nynu.goule.utils.DateUtil;
 import com.nynu.goule.utils.ValidateUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.sql.Timestamp;
+import java.util.*;
 
 
 @Service
@@ -38,8 +38,18 @@ public class ProductServiceImpl implements ProductService {
         pageNum = pageNum == 1 ? 1 : pageNum;
         pageSize = pageSize == 0 ? 5 : pageSize;
         PageHelper.startPage(pageNum, pageSize);
-        List<Product> products = productMapper.getAll();
-        PageInfo<Product> pageInfo = new PageInfo<>(products);
+        List<Map<String, Object>> products = productMapper.getAll();
+        for(int j=0; j<products.size(); j++){
+            Map<String, Object> map = products.get(j);
+            List<String> imgs = new ArrayList<>();
+            String imgInfo = (String) map.get("imgs");
+            String[] img = imgInfo.split(",");
+            for(int i=0; i<img.length; i++){
+                imgs.add(img[i]);
+            }
+            map.put("imgs",imgs);
+        }
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(products);
         if (!StringUtils.isEmpty(pageInfo)) {
             result.setData(pageInfo);
             result.setStatus(Result.RTN_CODE.SUCCESS);
@@ -74,26 +84,46 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * @param map
+     * @param param
      * @return
      */
     @Override
-    public Result addNewProduct(Map<String, Object> map) {
+    public Result addNewProduct(Map<String, Object> param) {
+        Map<String, Object> map = (Map<String, Object>) param.get("product");
         Result result = new Result();
-        String pCategoryId = (String) ValidateUtil.isBlankParam(map, "pCategoryId", "父分类"); //所在父分类
+        List<String> imgList = (List<String>) map.get("imgs");
+        Map<String, Object> inputMap = new HashMap<>();
+        String pCategoryId = (String) map.get("pCategoryId"); //所在父分类
+        String categoryId = (String) map.get("categoryId"); //二级分类Id
         String price = (String) map.get("price"); //价格
         String productName = (String) ValidateUtil.isBlankParam(map, "productName", "产品名"); //产品名称
         String description = (String) map.get("description"); //产品描述
         String detail = (String) map.get("detail"); //产品详情
-        String categoryId = (String) ValidateUtil.isBlankParam(map, "categoryId", "分类"); //所在分类
-        String imgs = (String) map.get("imgs"); //产品图片 --/暂不可用
+        String imgs = "";
+        if("".equals(categoryId)){
+            result.setMsg("一级分类下不可添加商品");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }
         int num = categoryMapper.queryCategoryNumById(Integer.valueOf(categoryId));
         int pNum = categoryMapper.queryCategoryNumById(Integer.valueOf(pCategoryId));
         if (num == 0 || pNum == 0) {
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg("分类不存在");
         } else {
-            int count = productMapper.addNewProduct(map);
+            for (int i=0; i<imgList.size(); i++){
+                imgs += imgList.get(0).toString() + ",";
+            }
+            Timestamp dateTime = DateUtil.getCurrentTimestamp();
+            inputMap.put("pCategoryId",pCategoryId);
+            inputMap.put("categoryId",categoryId);
+            inputMap.put("price",price);
+            inputMap.put("productName",productName);
+            inputMap.put("description",description);
+            inputMap.put("detail",detail);
+            inputMap.put("imgs",imgs);
+            inputMap.put("dateTime",dateTime);
+            int count = productMapper.addNewProduct(inputMap);
             if (count >= 1) {
                 result.setStatus(Result.RTN_CODE.SUCCESS);
                 result.setMsg("添加成功");
@@ -147,6 +177,41 @@ public class ProductServiceImpl implements ProductService {
             result.setStatus(Result.RTN_CODE.ERROR);
         }
         return result;
+    }
+
+    public Result uploadImages(MultipartFile file) throws IOException {
+        Result result = new Result();
+        Map<String, Object> imgMap = new HashMap<>();
+        File f = null;
+        if(file.equals("")||file.getSize()<=0){
+            file = null;
+        }else{
+            InputStream ins = file.getInputStream();
+            f=new File(file.getOriginalFilename());
+            inputStreamToFile(ins, f);
+        }
+        OSSUtil ossUtil = new OSSUtil();
+        imgMap= ossUtil.uploadObject2OSS(f);
+        result.setData(imgMap);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        File del = new File(f.toURI());
+        del.delete();
+        return result;
+    }
+
+    public static void inputStreamToFile(InputStream ins,File file) {
+        try {
+            OutputStream os = new FileOutputStream(file);
+            int bytesRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            ins.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

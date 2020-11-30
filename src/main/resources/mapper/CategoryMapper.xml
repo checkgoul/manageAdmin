@@ -5,7 +5,7 @@
 <mapper namespace="com.nynu.goule.mapper.CategoryMapper">
 
     <select id="queryAll" resultType="com.nynu.goule.pojo.Category" parameterType="com.nynu.goule.pojo.Category">
-        select * from categorys where parentId = #{parentId}
+        select id, category_name categoryName, parentId from categorys where parentId = #{parentId}
     </select>
 
     <insert id="addCategory" parameterType="com.nynu.goule.pojo.Category">

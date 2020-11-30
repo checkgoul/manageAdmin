@@ -91,7 +91,7 @@ public class OperateLogServiceImpl implements OperateLogService {
         if(month < 10){
             return year + "0" + month;
         }else {
-            return year + month;
+            return year;
         }
     }
 }

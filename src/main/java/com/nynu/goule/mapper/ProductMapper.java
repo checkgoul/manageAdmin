@@ -13,7 +13,7 @@ import java.util.Map;
 @Mapper
 public interface ProductMapper {
 
-    List<Product> getAll();
+    List<Map<String, Object>> getAll();
 
     List<Product> queryProductByIndex(Map<String, Object> map);
 
