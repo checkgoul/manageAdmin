@@ -88,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
      * @return
      */
     @Override
-    public Result addNewProduct(Map<String, Object> param) {
+    public Result addAndUpdateProduct(Map<String, Object> param) {
         Map<String, Object> map = (Map<String, Object>) param.get("product");
         Result result = new Result();
         List<String> imgList = (List<String>) map.get("imgs");
@@ -100,7 +100,7 @@ public class ProductServiceImpl implements ProductService {
         String description = (String) map.get("description"); //产品描述
         String detail = (String) map.get("detail"); //产品详情
         String imgs = "";
-        if("".equals(categoryId)){
+        if(null == map.get("categoryId")){
             result.setMsg("一级分类下不可添加商品");
             result.setStatus(Result.RTN_CODE.ERROR);
             return result;

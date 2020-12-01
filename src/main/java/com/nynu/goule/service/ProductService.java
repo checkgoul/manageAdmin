@@ -16,7 +16,7 @@ public interface ProductService {
 
     Result queryProductByIndex(int pageNum, int pageSize, String productName, String description);
 
-    Result addNewProduct(Map<String, Object> map) throws GeneralSecurityException;
+    Result addAndUpdateProduct(Map<String, Object> map) throws GeneralSecurityException;
 
     Result delProduct(int id);
 
