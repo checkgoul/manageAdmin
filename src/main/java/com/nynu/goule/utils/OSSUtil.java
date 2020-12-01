@@ -25,7 +25,7 @@ public class OSSUtil {
     private static String BACKET_NAME;
     //阿里云API的文件夹名称
     private static String FOLDER;
-    //初始化属性
+    //初始化属性 由于有自己的仓库信息,所以Constants不上传至github
     static{
         ENDPOINT = Constants.END_POINT;
         ACCESS_KEY_ID = Constants.ACCESS_KEY_ID;
