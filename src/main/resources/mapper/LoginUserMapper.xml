@@ -5,7 +5,41 @@
 <mapper namespace="com.nynu.goule.mapper.LoginUserMapper">
 
     <select id="login" parameterType="java.util.Map" resultType="java.util.Map">
-        select * from user_login where username=#{username}
+        select * from users where username=#{username}
     </select>
 
+    <insert id="addUser" parameterType="java.util.Map">
+        insert into users (
+        username,
+        password,
+        account_name,
+        telphone,
+        <if test="mail != null and mail != ''">
+            mail,
+        </if>
+        <if test="prsnIdNum != null and prsnIdNum != ''">
+            prsnIdNum,
+        </if>
+        <if test="birthDay != null and birthDay != ''">
+            birthDay,
+        </if>
+        addTime
+        )
+        VALUES (
+        #{username},
+        #{password},
+        #{accountName},
+        #{telPhone},
+        <if test="mail != null and mail != ''">
+            #{mail},
+        </if>
+        <if test="prsnIdNum != null and prsnIdNum != ''">
+            #{prsnIdNum},
+        </if>
+        <if test="birthDay != null and birthDay != ''">
+            #{birthDay},
+        </if>
+        #{addTime}
+        )
+    </insert>
 </mapper>

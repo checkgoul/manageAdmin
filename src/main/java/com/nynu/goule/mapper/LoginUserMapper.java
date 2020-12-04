@@ -10,4 +10,6 @@ import java.util.Map;
 public interface LoginUserMapper {
 
     Map<String, Object> login(String username);
+
+    int addUser(Map<String, Object> userInfoMap);
 }

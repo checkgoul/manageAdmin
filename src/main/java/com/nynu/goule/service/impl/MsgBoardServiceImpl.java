@@ -15,6 +15,10 @@ public class MsgBoardServiceImpl implements MsgBoardService {
     @Resource
     private MsgBoardMapper msgBoardMapper;
 
+    /**
+     * 查询所有留言板信息
+     * @return
+     */
     @Override
     public Result getAllMsg() {
         Result result = new Result();

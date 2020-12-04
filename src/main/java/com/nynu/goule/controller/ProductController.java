@@ -35,8 +35,8 @@ public class ProductController extends BaseController {
         return feedback(productService.queryProductByIndex(pageNum, pageSize, productName, description));
     }
 
-    @RequestMapping("/add")
-    public ModelAndView addProduct(@RequestBody Map<String, Object> map) throws GeneralSecurityException {
+    @RequestMapping("/addOrUpdate")
+    public ModelAndView addOrUpdateProduct(@RequestBody Map<String, Object> map) throws GeneralSecurityException {
         return feedback(productService.addAndUpdateProduct(map));
     }
 
@@ -56,9 +56,9 @@ public class ProductController extends BaseController {
         return feedback(productService.uploadImages(file));
     }
 
-    @RequestMapping("/delImages")
-    public ModelAndView delImages(){
-        return feedback();
+    @RequestMapping("/delImg")
+    public ModelAndView delImages(@RequestBody Map<String, Object> map){
+        return feedback(productService.deleteImages(map));
     }
 
 }

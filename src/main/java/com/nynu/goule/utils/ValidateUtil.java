@@ -16,10 +16,10 @@ public class ValidateUtil {
         if (StringUtils.isEmpty(map.get(key))) {
             if (!StringUtils.isEmpty(name)) {
                 String message = name + "不能为空";
-                throw new GeneralException(message);
+                return message;
             } else {
                 String message = key + "不能为空";
-                throw new GeneralException(message);
+                return message;
             }
         }
         return String.valueOf(map.get(key));

@@ -22,6 +22,10 @@ public class OperateLogServiceImpl implements OperateLogService {
     @Resource
     private OperateLogMapper operateLogMapper;
 
+    /**
+     * 记录日志接口
+     * @param param
+     */
     @Override
     public void addOperateLog(Map<String, Object> param) {
         String logId; //日志id和记录时间都由代码自动生成
@@ -51,6 +55,12 @@ public class OperateLogServiceImpl implements OperateLogService {
         operateLogMapper.addOperateLog(operateMap);
     }
 
+    /**
+     * 日志查询接口
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @Override
     public Result getOperateLog(int pageNum, int pageSize) {
         Result result = new Result();
@@ -66,6 +76,15 @@ public class OperateLogServiceImpl implements OperateLogService {
         return result;
     }
 
+    /**
+     * 通过指定内容搜索
+     * @param pageNum
+     * @param pageSize
+     * @param searchName
+     * @param opType
+     * @param opMenu
+     * @return
+     */
     @Override
     public Result searchInfoByAny(Integer pageNum, Integer pageSize, String searchName, String opType, String opMenu) {
         Result result = new Result();
@@ -84,6 +103,9 @@ public class OperateLogServiceImpl implements OperateLogService {
         return result;
     }
 
+    /*
+    获取当前年份/月份
+     */
     public static String getYearAndMonth(){
         Calendar c = Calendar.getInstance();
         String year = String.valueOf(c.get(Calendar.YEAR));

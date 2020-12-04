@@ -1,5 +1,8 @@
 package com.nynu.goule.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.nynu.goule.pojo.Category;
+import com.nynu.goule.utils.JsonUtil;
 import com.nynu.goule.utils.OSSUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -32,6 +35,12 @@ public class ProductServiceImpl implements ProductService {
     @Resource
     private OperateLogService operateLogService;
 
+    /**
+     * 查询所有的商品信息(分页查询
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @Override
     public Result getAll(int pageNum, int pageSize) {
         Result result = new Result();
@@ -43,11 +52,13 @@ public class ProductServiceImpl implements ProductService {
             Map<String, Object> map = products.get(j);
             List<String> imgs = new ArrayList<>();
             String imgInfo = (String) map.get("imgs");
-            String[] img = imgInfo.split(",");
-            for(int i=0; i<img.length; i++){
-                imgs.add(img[i]);
+            if(!("".equals(imgInfo))) {
+                String[] img = imgInfo.split(",");
+                for (int i = 0; i < img.length; i++) {
+                    imgs.add(img[i]);
+                }
+                map.put("imgs", imgs);
             }
-            map.put("imgs",imgs);
         }
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(products);
         if (!StringUtils.isEmpty(pageInfo)) {
@@ -60,6 +71,14 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
+    /**
+     * 根据指定的搜索内容去查询指定的信息
+     * @param pageNum
+     * @param pageSize
+     * @param productName
+     * @param description
+     * @return
+     */
     @Override
     public Result queryProductByIndex(int pageNum, int pageSize, String productName, String description) {
         Result result = new Result();
@@ -84,6 +103,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
+     * 添加或者修改商品信息
      * @param param
      * @return
      */
@@ -91,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
     public Result addAndUpdateProduct(Map<String, Object> param) {
         Map<String, Object> map = (Map<String, Object>) param.get("product");
         Result result = new Result();
+        Map<String, Object> operateMap = new HashMap<>();
         List<String> imgList = (List<String>) map.get("imgs");
         Map<String, Object> inputMap = new HashMap<>();
         String pCategoryId = (String) map.get("pCategoryId"); //所在父分类
@@ -100,37 +121,62 @@ public class ProductServiceImpl implements ProductService {
         String description = (String) map.get("description"); //产品描述
         String detail = (String) map.get("detail"); //产品详情
         String imgs = "";
-        if(null == map.get("categoryId")){
-            result.setMsg("一级分类下不可添加商品");
-            result.setStatus(Result.RTN_CODE.ERROR);
-            return result;
-        }
-        int num = categoryMapper.queryCategoryNumById(Integer.valueOf(categoryId));
-        int pNum = categoryMapper.queryCategoryNumById(Integer.valueOf(pCategoryId));
-        if (num == 0 || pNum == 0) {
-            result.setStatus(Result.RTN_CODE.ERROR);
-            result.setMsg("分类不存在");
-        } else {
-            for (int i=0; i<imgList.size(); i++){
-                imgs += imgList.get(0).toString() + ",";
-            }
-            Timestamp dateTime = DateUtil.getCurrentTimestamp();
-            inputMap.put("pCategoryId",pCategoryId);
-            inputMap.put("categoryId",categoryId);
-            inputMap.put("price",price);
-            inputMap.put("productName",productName);
-            inputMap.put("description",description);
-            inputMap.put("detail",detail);
-            inputMap.put("imgs",imgs);
-            inputMap.put("dateTime",dateTime);
-            int count = productMapper.addNewProduct(inputMap);
-            if (count >= 1) {
-                result.setStatus(Result.RTN_CODE.SUCCESS);
-                result.setMsg("添加成功");
-            } else {
+        if(null == map.get("id")) {
+            if (null == map.get("categoryId")) {
+                result.setMsg("一级分类下不可添加商品");
                 result.setStatus(Result.RTN_CODE.ERROR);
-                result.setMsg("添加失败");
+                return result;
             }
+            int num = categoryMapper.queryCategoryNumById(Integer.valueOf(categoryId));
+            int pNum = categoryMapper.queryCategoryNumById(Integer.valueOf(pCategoryId));
+            if (num == 0 || pNum == 0) {
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("分类不存在");
+            } else {
+                for (int i = 0; i < imgList.size(); i++) {
+                    imgs += imgList.get(0).toString() + ",";
+                }
+                Timestamp dateTime = DateUtil.getCurrentTimestamp();
+                inputMap.put("pCategoryId", pCategoryId);
+                inputMap.put("categoryId", categoryId);
+                inputMap.put("price", price);
+                inputMap.put("productName", productName);
+                inputMap.put("description", description);
+                inputMap.put("detail", detail);
+                inputMap.put("imgs", imgs);
+                inputMap.put("dateTime", dateTime);
+                int count = productMapper.addNewProduct(inputMap);
+                if (count >= 1) {
+                    result.setStatus(Result.RTN_CODE.SUCCESS);
+                    result.setMsg("添加成功");
+                    Map<String, Object> map1 = new HashMap<>();
+                    map1.put("id",categoryId);
+                    Map<String, Object> afterCntt = new HashMap<>();
+                    Category category = categoryMapper.getCategoryNameById(map1);
+
+                    //记录日志操作
+                    afterCntt.put("categoryId",categoryId);
+                    afterCntt.put("categoryName",category.getCategoryName());
+                    afterCntt.put("productName",productName);
+                    afterCntt.put("price",price);
+                    afterCntt.put("description",description);
+                    String msg = JSON.toJSONString(afterCntt); //前端详情展示需要,转json后才能正常显示
+                    String logCntt = "新增商品“"+ productName +"”";
+                    operateMap.put("acctId",param.get("account_name"));
+                    operateMap.put("opType", OperateLog.OP_TYPE.ADD);
+                    operateMap.put("logCntt",logCntt);
+                    operateMap.put("opMenu",OperateLog.OP_PATH.PRODUCT_MANAGEMENT);
+                    operateMap.put("afterCntt",msg);
+                    operateLogService.addOperateLog(operateMap);
+                } else {
+                    result.setStatus(Result.RTN_CODE.ERROR);
+                    result.setMsg("添加失败");
+                }
+            }
+        }else{
+            String id = (String) map.get("id");
+            Map<String, Object> productInfoMap = productMapper.getProductInfoById(map);
+
         }
         return result;
     }
@@ -141,6 +187,11 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
+    /**
+     * 更新商品的状态 在售->下架  ,  下架->在售
+     * @param map
+     * @return
+     */
     @Override
     public Result updateStatus(Map<String, Object> map) {
         Result result = new Result();
@@ -179,6 +230,12 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
+    /**
+     * 上传图片至阿里云
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public Result uploadImages(MultipartFile file) throws IOException {
         Result result = new Result();
         Map<String, Object> imgMap = new HashMap<>();
@@ -199,6 +256,27 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
+    /**
+     * 从阿里云删除图片
+     * @param map
+     * @return
+     */
+    @Override
+    public Result deleteImages(Map<String, Object> map) {
+        Result result = new Result();
+        OSSUtil ossUtil = new OSSUtil();
+        String name = (String) map.get("name");
+        ossUtil.deleteFile(name);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
+    /**
+     *
+     * 将传入过来 MultipartFile类型的file转为File类型
+     * @param ins
+     * @param file
+     */
     public static void inputStreamToFile(InputStream ins,File file) {
         try {
             OutputStream os = new FileOutputStream(file);

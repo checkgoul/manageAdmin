@@ -11,7 +11,7 @@
             productname productName,
             price,
             description,
-            productstatus,
+            productstatus productStatus,
             imgs,
             detail,
             addTime
@@ -38,9 +38,13 @@
         productname,
         price,
         description,
-        imgs,
-        detail,
-        addTime
+        addTime,
+        <if test="imgs != null and imgs != ''">
+            imgs,
+        </if>
+        <if test="detail != null and detail != ''">
+            detail
+        </if>
         )
         VALUES
         (
@@ -49,13 +53,13 @@
         #{productName},
         #{price},
         #{description},
+        #{dateTime},
         <if test="imgs != null and imgs != ''">
             #{imgs},
         </if>
         <if test="detail != null and detail != ''">
-            #{detail},
+            #{detail}
         </if>
-        #{dateTime}
         )
     </insert>
 
@@ -69,6 +73,6 @@
     </update>
 
     <select id="getProductInfoById" parameterType="java.util.Map" resultType="java.util.Map">
-        select * from products where id = #{id}
+        select id,productname from products where id = #{id}
     </select>
 </mapper>

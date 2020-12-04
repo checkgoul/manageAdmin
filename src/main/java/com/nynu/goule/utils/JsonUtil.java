@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 public class JsonUtil {
 
     private static ObjectMapper objectMapper;
-    private static Logger LOGGER = (Logger) LoggerFactory.getLogger(JsonUtil.class);
     private static Map convertorMap = new HashMap<>();
 
     static {

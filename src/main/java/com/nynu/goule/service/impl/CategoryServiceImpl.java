@@ -26,6 +26,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Resource
     private OperateLogService operateLogService;
 
+    /**
+     * 查询所有的分类,前端分页(分类数量较小
+     * @param parentId
+     * @return
+     */
     @Override
     public Result queryAll(String parentId) {
         List<Category> categoryList = categoryMapper.queryAll(parentId);
@@ -40,6 +45,11 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    /**
+     * 添加分类
+     * @param categoryMap
+     * @return
+     */
     @Override
     public Result addCategory(Map<String, Object> categoryMap) {
         Result result = new Result();
@@ -84,6 +94,11 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    /**
+     * 修改分类名称
+     * @param categoryMap
+     * @return
+     */
     @Override
     public Result updateCategory(Map<String, Object> categoryMap) {
         Result result = new Result();
@@ -122,6 +137,11 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    /**
+     * 删除分类
+     * @param categoryMap
+     * @return
+     */
     @Override
     public Result delCategory(Map<String, Object> categoryMap) {
         Result result = new Result();
@@ -177,6 +197,11 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
+    /**
+     * 根据分类id查询分类名称
+     * @param id
+     * @return
+     */
     @Override
     public Result categoryInfo(String id) {
         Result result = new Result();
