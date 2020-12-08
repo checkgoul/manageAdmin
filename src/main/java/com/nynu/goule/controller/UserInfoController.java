@@ -19,4 +19,9 @@ public class UserInfoController extends BaseController {
     public ModelAndView addUser(@RequestBody Map<String, Object> paramMap){
         return feedback(loginUserService.addUser(paramMap));
     }
+
+    @RequestMapping("/toGetAcctId")
+    public ModelAndView toGetAcctId(@RequestBody Map<String, Object> map){
+        return feedback(loginUserService.toGetAcctId(map));
+    }
 }

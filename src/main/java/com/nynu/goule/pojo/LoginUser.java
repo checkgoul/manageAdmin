@@ -1,5 +1,8 @@
 package com.nynu.goule.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import javax.persistence.Column;
 import java.sql.Date;
 
 public class LoginUser {
@@ -12,6 +15,9 @@ public class LoginUser {
     private String mail;
     private String prsnIdNum;
     private String roleId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "addTime")
     private Date addTime;
 
     public int getId() {

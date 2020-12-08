@@ -11,4 +11,6 @@ public interface LoginUserService {
     Result login(Map<String, Object> paramMap, HttpServletRequest request) throws Exception;
 
     Result addUser(Map<String, Object> paramMap);
+
+    Result toGetAcctId(Map<String, Object> map);
 }

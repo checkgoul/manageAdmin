@@ -13,7 +13,9 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -78,8 +80,11 @@ public class LoginUserServiceImpl implements LoginUserService {
         Result result = new Result();
         Map<String, Object> paramMap = (Map<String, Object>) map.get("user");
         Map<String, Object> userInfoMap = new HashMap<>();
-        String accountName = ValidateUtil.isBlankParam(paramMap,"accountName","主账号");
+        String accountName = ValidateUtil.isBlankParam(paramMap,"accountName","人员姓名");
         String telPhone = ValidateUtil.isBlankParam(paramMap,"telPhone","手机号");
+        String username = ValidateUtil.isBlankParam(paramMap,"username","主账号");
+        String mail = (String) paramMap.get("mail");
+        String prsnIdNum = (String) paramMap.get("prsnIdNum");
         if("主账号不能为空".equals(accountName)){
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg(accountName);
@@ -90,13 +95,12 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg(telPhone);
             return result;
         }
-        String mail = (String) paramMap.get("mail");
-        String prsnIdNum = (String) paramMap.get("prsnIdNum");
         if(!RegExUtil.isMobile(telPhone)){
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg("手机号填写错误");
             return result;
         }
+        //todo sql 为了防止手机号码重复
         if (StringUtil.isNotEmpty(mail)){
             if(RegExUtil.isEmail(mail)){
                 userInfoMap.put("mail",mail);
@@ -118,8 +122,6 @@ public class LoginUserServiceImpl implements LoginUserService {
         }else {
             userInfoMap.put("birthDay","");
         }
-        String username = ToPinYin.converterToAllSpell(accountName); //登录的主账号为填写人姓名的拼音 例: 王瑜 -> wangyu 如果拼音相同,则依次递增 -> wangyu1
-        //todo sql
         String password = "nynu@"+username.substring(0,2)+telPhone.substring(7); // password 为 nynu+@+姓名拼音前两位+手机号后四位 例: nynu@wa9321
         Timestamp time = DateUtil.getCurrentTimestamp();
         userInfoMap.put("accountName",accountName);
@@ -140,7 +142,7 @@ public class LoginUserServiceImpl implements LoginUserService {
             afterCntt.put("telPhone",telPhone);
             afterCntt.put("prsnIdNum",prsnIdNum);
             afterCntt.put("addTime",time);
-            String msg = JSON.toJSONString(afterCntt);
+            String msg = JsonUtil.convertObject2Json(afterCntt);
             String opCntt = "新增用户“"+ accountName +"”";
             operateMap.put("acctId",map.get("account_name"));
             operateMap.put("opType", OperateLog.OP_TYPE.ADD);
@@ -152,6 +154,52 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg("添加用户信息失败");
         }
+        return result;
+    }
+
+    @Override
+    public Result toGetAcctId(Map<String, Object> map) {
+        Result result = new Result();
+        String accountName = ValidateUtil.isBlankParam(map,"accountName","人员姓名");
+        if("人员姓名不能为空".equals(accountName)){
+            result.setStatus(Result.RTN_CODE.ERROR);
+            result.setMsg("请先输入人员姓名");
+            return result;
+        }
+        String username = ToPinYin.converterToAllSpell(accountName); //登录的主账号为填写人姓名的拼音 例: 王瑜 -> wangyu 如果拼音相同,则依次递增 -> wangyu1
+        List<Map<String, Object>> usernameMap = loginUserMapper.queryUsernameCount(username);
+        String order = "";
+        if(usernameMap != null && !usernameMap.isEmpty()) {
+            for (Map<String, Object> realMap : usernameMap) {
+                String finalUsername = (String) realMap.get("username");
+                if (finalUsername.length() > username.length()) {
+                    finalUsername = finalUsername.substring(username.length());
+                }else {
+                    continue;
+                }
+                boolean flag = finalUsername.matches("^[0-9]*$");
+                if(flag){
+                    if(order == ""){
+                        order = finalUsername;
+                    } else{
+                        order = order + "," + finalUsername;
+                    }
+                }
+            }
+            if(StringUtil.isNotEmpty(order)){
+                String[] arrs = order.split(",");
+                int[] ints = new int[arrs.length];
+                for(int i=0; i< arrs.length; i++){
+                    ints[i] = Integer.parseInt(arrs[i]);
+                }
+                Arrays.sort(ints);
+                username = username + Integer.toString(ints[ints.length - 1] + 1);
+            }else{
+                username = username + "1";
+            }
+        }
+        result.setData(username);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
         return result;
     }
 }

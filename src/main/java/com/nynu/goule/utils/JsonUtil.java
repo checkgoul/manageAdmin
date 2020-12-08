@@ -24,7 +24,7 @@ public class JsonUtil {
 
     static {
         objectMapper = new ObjectMapper();
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-mm-dd HH:MM:SS"));
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
     private JsonUtil() {
