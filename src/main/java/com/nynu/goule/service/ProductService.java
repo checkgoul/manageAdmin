@@ -25,4 +25,6 @@ public interface ProductService {
     Result uploadImages(MultipartFile file) throws IOException;
 
     Result deleteImages(Map<String, Object> map);
+
+    Result getProductById(Map<String, Object> map);
 }

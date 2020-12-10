@@ -2,11 +2,18 @@ package com.nynu.goule.service.impl;
 
 import com.nynu.goule.common.Result;
 import com.nynu.goule.mapper.CategoryMapper;
+import com.nynu.goule.mapper.LoginUserMapper;
 import com.nynu.goule.mapper.ProductMapper;
+import com.nynu.goule.mapper.RoleAuthMapper;
 import com.nynu.goule.pojo.Category;
+import com.nynu.goule.pojo.LoginUser;
 import com.nynu.goule.pojo.OperateLog;
+import com.nynu.goule.pojo.RoleAuth;
 import com.nynu.goule.service.CategoryService;
 import com.nynu.goule.service.OperateLogService;
+import com.nynu.goule.utils.CommonConstants;
+import com.nynu.goule.utils.JsonUtil;
+import com.nynu.goule.utils.Security;
 import com.nynu.goule.utils.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -26,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Resource
     private OperateLogService operateLogService;
 
+    Security security = new Security();
     /**
      * 查询所有的分类,前端分页(分类数量较小
      * @param parentId
@@ -56,40 +64,50 @@ public class CategoryServiceImpl implements CategoryService {
         Map<String ,Object> operateMap = new HashMap<>();
         String categoryName = (String) categoryMap.get("categoryName");
         String parentId = (String) categoryMap.get("parentId");
-        String mainAcctId = (String) categoryMap.get("account_name");
-        if (!categoryName.isEmpty() && !"".equals(categoryName) && (categoryName.length() < 20)) {
-            int num = categoryMapper.queryCategoryNum(categoryName);
-            if (num >= 1) {
-                result.setStatus(Result.RTN_CODE.ERROR);
-                result.setMsg("该分类已存在");
-                return result;
-            } else {
-                int count = categoryMapper.addCategory(categoryName, parentId);
-                if (count == 1) {
-                    result.setMsg("添加成功");
-                    result.setStatus(Result.RTN_CODE.SUCCESS);
-                    if("0".equals(parentId)){
-                        String msg = "新增: 一级分类==>“" + categoryName+"”";
-                        operateMap.put("logCntt",msg);
-                    }else{
-                        String msg = "新增: 二级分类==>“" + categoryName+"”";
-                        operateMap.put("logCntt",msg);
-                    }
-                    operateMap.put("acctId",mainAcctId);
-                    operateMap.put("opType",OperateLog.OP_TYPE.ADD);
-                    operateMap.put("opMenu",OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
-                    operateMap.put("afterCntt",categoryName);
-                    operateLogService.addOperateLog(operateMap);
-                } else {
-                    result.setMsg("添加失败");
+        String mainAcctId = (String) categoryMap.get("username");
+        boolean isAuth = security.checkAccountAuth(mainAcctId, CommonConstants.AUTHID.INSERT);
+        if(isAuth) {
+            if (!categoryName.isEmpty() && !"".equals(categoryName) && (categoryName.length() < 20)) {
+                int num = categoryMapper.queryCategoryNum(categoryName);
+                if (num >= 1) {
                     result.setStatus(Result.RTN_CODE.ERROR);
+                    result.setMsg("该分类已存在");
                     return result;
+                } else {
+                    int count = categoryMapper.addCategory(categoryName, parentId);
+                    if (count == 1) {
+                        //记录操作日志
+                        result.setMsg("添加成功");
+                        result.setStatus(Result.RTN_CODE.SUCCESS);
+                        if ("0".equals(parentId)) {
+                            String msg = "新增: 一级分类==>“" + categoryName + "”";
+                            operateMap.put("logCntt", msg);
+                        } else {
+                            String msg = "新增: 二级分类==>“" + categoryName + "”";
+                            operateMap.put("logCntt", msg);
+                        }
+                        Map<String, Object> categoryNameMap = new HashMap<>();
+                        categoryNameMap.put("categoryName", categoryName);
+                        String afterMsg = JsonUtil.convertObject2Json(categoryNameMap);
+                        operateMap.put("acctId", mainAcctId);
+                        operateMap.put("opType", OperateLog.OP_TYPE.ADD);
+                        operateMap.put("opMenu", OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
+                        operateMap.put("afterCntt", afterMsg);
+                        operateLogService.addOperateLog(operateMap);
+                    } else {
+                        result.setMsg("添加失败");
+                        result.setStatus(Result.RTN_CODE.ERROR);
+                        return result;
+                    }
                 }
+            } else {
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("分类名称不符合规范");
+                return result;
             }
-        } else {
+        }else{
+            result.setMsg("您没有当前操作权限");
             result.setStatus(Result.RTN_CODE.ERROR);
-            result.setMsg("分类名称不符合规范");
-            return result;
         }
         return result;
     }
@@ -106,33 +124,46 @@ public class CategoryServiceImpl implements CategoryService {
         Map<String ,Object> map = new HashMap<>();
         int id = (int) categoryMap.get("id");
         String categoryName = (String) categoryMap.get("categoryName");
-        String mainAcctId = (String) categoryMap.get("account_name");
+        String mainAcctId = (String) categoryMap.get("username");
         map.put("id",id);
-        Category category = categoryMapper.getCategoryNameById(map);
-        String beforeCategoryName = category.getCategoryName(); //删除前的名称
-        int num = categoryMapper.queryCategoryNum(categoryName);
-        if (num >= 1) {
-            result.setStatus(Result.RTN_CODE.ERROR);
-            result.setMsg("该分类已存在");
-            return result;
-        } else {
-            int count = categoryMapper.updateCategory(categoryName, id);
-            if (count >= 1) {
-                result.setMsg("修改成功");
-                result.setStatus(Result.RTN_CODE.SUCCESS);
-                String msg = "修改: “" + beforeCategoryName + "” ==> “" + categoryName + "”";
-                operateMap.put("acctId",mainAcctId);
-                operateMap.put("opType",OperateLog.OP_TYPE.MODIFY);
-                operateMap.put("logCntt",msg);
-                operateMap.put("opMenu",OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
-                operateMap.put("beforeCntt",beforeCategoryName);
-                operateMap.put("afterCntt",categoryName);
-                operateLogService.addOperateLog(operateMap);
-            } else {
-                result.setMsg("修改失败");
+        boolean isAuth = security.checkAccountAuth(mainAcctId,CommonConstants.AUTHID.UPDATE);
+        if(isAuth) {
+            Category category = categoryMapper.getCategoryNameById(map);
+            String beforeCategoryName = category.getCategoryName(); //删除前的名称
+            int num = categoryMapper.queryCategoryNum(categoryName);
+            if (num >= 1) {
                 result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("该分类已存在");
                 return result;
+            } else {
+                int count = categoryMapper.updateCategory(categoryName, id);
+                if (count >= 1) {
+                    //记录操作日志
+                    Map<String, Object> beforeMap = new HashMap<>();
+                    Map<String, Object> afterMap = new HashMap<>();
+                    beforeMap.put("categoryName", beforeCategoryName);
+                    afterMap.put("categoryName", categoryName);
+                    String beforeMsg = JsonUtil.convertObject2Json(beforeMap);
+                    String afterMsg = JsonUtil.convertObject2Json(afterMap);
+                    result.setMsg("修改成功");
+                    result.setStatus(Result.RTN_CODE.SUCCESS);
+                    String msg = "修改原分类名: “" + beforeCategoryName + "”";
+                    operateMap.put("acctId", mainAcctId);
+                    operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
+                    operateMap.put("logCntt", msg);
+                    operateMap.put("opMenu", OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
+                    operateMap.put("beforeCntt", beforeMsg);
+                    operateMap.put("afterCntt", afterMsg);
+                    operateLogService.addOperateLog(operateMap);
+                } else {
+                    result.setMsg("修改失败");
+                    result.setStatus(Result.RTN_CODE.ERROR);
+                    return result;
+                }
             }
+        }else{
+            result.setMsg("您没有当前操作权限");
+            result.setStatus(Result.RTN_CODE.ERROR);
         }
         return result;
     }
@@ -148,53 +179,64 @@ public class CategoryServiceImpl implements CategoryService {
         Map<String ,Object> operateMap = new HashMap<>();
         Map<String ,Object> map = new HashMap<>();
         int id = (int) categoryMap.get("id");
-        String mainAcctId = (String) categoryMap.get("account_name");
-        map.put("id",id);
-        //入库操作需要
-        Category category = categoryMapper.getCategoryNameById(map);
-        Category category1 = categoryMapper.getCategoryParentIdById(map);
-        String parentId1 =  category1.getParentId();
-        String beforeCategoryName = category.getCategoryName(); //删除前的名称
-        int num = categoryMapper.queryCategoryNumById(id);
-        if (num <= 0) {
-            result.setMsg("删除失败");
-            result.setStatus(Result.RTN_CODE.ERROR);
-            return result;
-        } else {
-            String parentId = Integer.toString(id);
-            int secondCategoryNum = categoryMapper.queryCategoryNumByParentId(parentId); // 父集下存在子集
-            int categoryChildNum = productMapper.queryCategoryChildNumByParentId(parentId); // 子集下存在商品
-            if (secondCategoryNum >= 1 || categoryChildNum >= 1) {
-                result.setMsg("存在子分类,不可删除");
+        String mainAcctId = (String) categoryMap.get("username");
+        boolean isAuth = security.checkAccountAuth(mainAcctId,CommonConstants.AUTHID.DELETE);
+        if(isAuth) {
+            map.put("id", id);
+            //入库操作需要
+            Category category = categoryMapper.getCategoryNameById(map);
+            Category category1 = categoryMapper.getCategoryParentIdById(map);
+            String parentId1 = category1.getParentId();
+            String beforeCategoryName = category.getCategoryName(); //删除前的名称
+            int num = categoryMapper.queryCategoryNumById(id);
+            if (num <= 0) {
+                result.setMsg("删除失败");
                 result.setStatus(Result.RTN_CODE.ERROR);
                 return result;
             } else {
-                int count = categoryMapper.delCategory(id);
-                if (count >= 1) {
-                    result.setMsg("删除成功");
-                    result.setStatus(Result.RTN_CODE.SUCCESS);
-                    if("0".equals(parentId1)){
-                        String msg = "删除: 一级分类==>“" + beforeCategoryName+"”";
-                        operateMap.put("logCntt",msg);
-                    }else{
-                        String msg = "删除: 二级分类==>“" + beforeCategoryName+"”";
-                        operateMap.put("logCntt",msg);
-                    }
-                    operateMap.put("acctId",mainAcctId);
-                    operateMap.put("opType", OperateLog.OP_TYPE.DELETE);
-                    operateMap.put("opMenu",OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
-                    operateMap.put("beforeCntt",beforeCategoryName);
-                } else {
-                    result.setMsg("删除失败");
+                String parentId = Integer.toString(id);
+                int secondCategoryNum = categoryMapper.queryCategoryNumByParentId(parentId); // 父集下存在子集
+                int categoryChildNum = productMapper.queryCategoryChildNumByParentId(parentId); // 子集下存在商品
+                if (secondCategoryNum >= 1 || categoryChildNum >= 1) {
+                    result.setMsg("存在子分类,不可删除");
                     result.setStatus(Result.RTN_CODE.ERROR);
                     return result;
+                } else {
+                    int count = categoryMapper.delCategory(id);
+                    if (count >= 1) {
+                        result.setMsg("删除成功");
+                        result.setStatus(Result.RTN_CODE.SUCCESS);
+                        if ("0".equals(parentId1)) {
+                            String msg = "删除: 一级分类==>“" + beforeCategoryName + "”";
+                            operateMap.put("logCntt", msg);
+                        } else {
+                            String msg = "删除: 二级分类==>“" + beforeCategoryName + "”";
+                            operateMap.put("logCntt", msg);
+                        }
+                        //记录操作日志
+                        Map<String, Object> beforeMap = new HashMap<>();
+                        beforeMap.put("categoryName", beforeCategoryName);
+                        String beforeMsg = JsonUtil.convertObject2Json(beforeMap);
+                        operateMap.put("acctId", mainAcctId);
+                        operateMap.put("opType", OperateLog.OP_TYPE.DELETE);
+                        operateMap.put("opMenu", OperateLog.OP_PATH.CATEGORY_MANAGEMENT);
+                        operateMap.put("beforeCntt", beforeMsg);
+                    } else {
+                        result.setMsg("删除失败");
+                        result.setStatus(Result.RTN_CODE.ERROR);
+                        return result;
+                    }
                 }
             }
-        }
-        if(operateMap.size() > 0){
-            operateLogService.addOperateLog(operateMap);
+            if (operateMap.size() > 0) {
+                operateLogService.addOperateLog(operateMap);
+            }
+        }else{
+            result.setMsg("您没有当前操作权限");
+            result.setStatus(Result.RTN_CODE.ERROR);
         }
         return result;
+
     }
 
     /**

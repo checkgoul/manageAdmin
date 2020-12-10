@@ -13,10 +13,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class LoginUserServiceImpl implements LoginUserService {
@@ -85,7 +82,7 @@ public class LoginUserServiceImpl implements LoginUserService {
         String username = ValidateUtil.isBlankParam(paramMap,"username","主账号");
         String mail = (String) paramMap.get("mail");
         String prsnIdNum = (String) paramMap.get("prsnIdNum");
-        if("主账号不能为空".equals(accountName)){
+        if("人员姓名不能为空".equals(accountName)){
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg(accountName);
             return result;
@@ -100,7 +97,12 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("手机号填写错误");
             return result;
         }
-        //todo sql 为了防止手机号码重复
+        int phoneNum = loginUserMapper.queryPhoneNum(paramMap);
+        if(phoneNum >= 1) {
+            result.setMsg("该手机号已注册");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }
         if (StringUtil.isNotEmpty(mail)){
             if(RegExUtil.isEmail(mail)){
                 userInfoMap.put("mail",mail);
@@ -139,12 +141,16 @@ public class LoginUserServiceImpl implements LoginUserService {
             Map<String, Object> operateMap = new HashMap<>();
             Map<String, Object> afterCntt = new HashMap<>();
             afterCntt.put("acctId",accountName);
-            afterCntt.put("telPhone",telPhone);
-            afterCntt.put("prsnIdNum",prsnIdNum);
+            afterCntt.put("telPhone",telPhone.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+            if("".equals(prsnIdNum) || null == prsnIdNum){
+                afterCntt.put("prsnIdNum","");
+            }else {
+                afterCntt.put("prsnIdNum", prsnIdNum.replaceAll("(\\d{4})\\d{10}(\\w{4})", "$1*****$2"));
+            }
             afterCntt.put("addTime",time);
             String msg = JsonUtil.convertObject2Json(afterCntt);
             String opCntt = "新增用户“"+ accountName +"”";
-            operateMap.put("acctId",map.get("account_name"));
+            operateMap.put("acctId",map.get("username"));
             operateMap.put("opType", OperateLog.OP_TYPE.ADD);
             operateMap.put("opMenu",OperateLog.OP_PATH.USER_MANAGEMENT);
             operateMap.put("afterCntt",msg);
@@ -167,10 +173,10 @@ public class LoginUserServiceImpl implements LoginUserService {
             return result;
         }
         String username = ToPinYin.converterToAllSpell(accountName); //登录的主账号为填写人姓名的拼音 例: 王瑜 -> wangyu 如果拼音相同,则依次递增 -> wangyu1
-        List<Map<String, Object>> usernameMap = loginUserMapper.queryUsernameCount(username);
+        List<Map<String, Object>> usernameList = loginUserMapper.queryUsernameCount(username);
         String order = "";
-        if(usernameMap != null && !usernameMap.isEmpty()) {
-            for (Map<String, Object> realMap : usernameMap) {
+        if(usernameList != null && !usernameList.isEmpty()) {
+            for (Map<String, Object> realMap : usernameList) {
                 String finalUsername = (String) realMap.get("username");
                 if (finalUsername.length() > username.length()) {
                     finalUsername = finalUsername.substring(username.length());
@@ -200,6 +206,35 @@ public class LoginUserServiceImpl implements LoginUserService {
         }
         result.setData(username);
         result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
+    /**
+     * 获取所有用户的信息
+     * @return
+     */
+    @Override
+    public Result getAllUserInfo() {
+        Result result = new Result();
+        List<Map<String, Object>> userInfoList = loginUserMapper.getAllUserInfo();
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("users",userInfoList);
+        returnMap.put("roles","");
+        result.setData(returnMap);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Result checkPhoneNum(Map<String, Object> map) {
+        Result result = new Result();
+        int phoneNum = loginUserMapper.queryPhoneNum(map);
+        if(phoneNum >= 1){
+            result.setMsg("该手机号已注册");
+            result.setStatus(Result.RTN_CODE.ERROR);
+        }else{
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+        }
         return result;
     }
 }

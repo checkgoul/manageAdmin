@@ -75,4 +75,37 @@
     <select id="getProductInfoById" parameterType="java.util.Map" resultType="java.util.Map">
         select id,productname from products where id = #{id}
     </select>
+
+    <select id="getProductInfoByIdNew" parameterType="java.util.Map" resultType="java.util.Map">
+        select id,productname productName,categoryId,pCategoryId,price,imgs,detail,description from products where id = #{id}
+    </select>
+
+    <update id="updateProduct" parameterType="java.util.Map">
+        UPDATE products
+        SET
+         categoryId = #{categoryId},
+         pCategoryId = #{pCategoryId},
+         productname = #{productName},
+         price = #{price},
+         description = #{description},
+         imgs = #{imgs},
+         detail = #{detail}
+        WHERE
+            id = #{id}
+    </update>
+
+    <select id="getProductByCategoryId" parameterType="java.util.Map" resultType="java.util.Map">
+        select id,
+            categoryId,
+            pCategoryId,
+            productname productName,
+            price,
+            description,
+            productstatus productStatus,
+            imgs,
+            detail,
+            addTime
+	 from products
+	 where categoryId = #{id}
+    </select>
 </mapper>

@@ -15,4 +15,10 @@ public interface LoginUserMapper {
     int addUser(Map<String, Object> userInfoMap);
 
     List<Map<String, Object>> queryUsernameCount(String username);
+
+    List<Map<String, Object>> getAllUserInfo();
+
+    int queryPhoneNum(Map<String, Object> map);
+
+    LoginUser getUserIdByUserName(String username);
 }

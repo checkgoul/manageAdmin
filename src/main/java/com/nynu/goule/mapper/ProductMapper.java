@@ -24,4 +24,9 @@ public interface ProductMapper {
     int updateStatusById(Map<String, Object> param);
 
     Map<String, Object> getProductInfoById(Map<String, Object> map);
+    List<Map<String, Object>> getProductInfoByIdNew(Map<String, Object> map);
+
+    int updateProduct(Map<String, Object> map);
+
+    List<Map<String, Object>> getProductByCategoryId(Map<String, Object> map);
 }

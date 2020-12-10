@@ -13,4 +13,8 @@ public interface LoginUserService {
     Result addUser(Map<String, Object> paramMap);
 
     Result toGetAcctId(Map<String, Object> map);
+
+    Result getAllUserInfo();
+
+    Result checkPhoneNum(Map<String, Object> map);
 }

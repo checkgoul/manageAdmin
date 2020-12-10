@@ -12,7 +12,7 @@
         insert into users (
         username,
         password,
-        account_name,
+        username,
         telphone,
         <if test="mail != null and mail != ''">
             mail,
@@ -46,5 +46,17 @@
     <select id="queryUsernameCount" parameterType="java.lang.String" resultType="java.util.Map">
         select username from users where
         username like concat('%',#{username},'%')
+    </select>
+
+    <select id="getAllUserInfo" resultType="java.util.Map">
+        select id,username,username accountName,telphone,mail,prsnIdNum,birthDay,DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime from users ORDER BY addTime desc
+    </select>
+
+    <select id="queryPhoneNum" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(*) from users where telphone = #{telPhone}
+    </select>
+
+    <select id="getUserIdByUserName" resultType="com.nynu.goule.pojo.LoginUser" parameterType="String">
+        select id from users where username = #{mainAcctId}
     </select>
 </mapper>

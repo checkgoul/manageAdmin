@@ -24,4 +24,14 @@ public class UserInfoController extends BaseController {
     public ModelAndView toGetAcctId(@RequestBody Map<String, Object> map){
         return feedback(loginUserService.toGetAcctId(map));
     }
+
+    @RequestMapping("/userInfo")
+    public ModelAndView getAllUserInfo(){
+        return feedback(loginUserService.getAllUserInfo());
+    }
+
+    @RequestMapping("/checkPhone")
+    public ModelAndView checkPhoneNum(@RequestBody Map<String, Object> map) {
+        return feedback(loginUserService.checkPhoneNum(map));
+    }
 }

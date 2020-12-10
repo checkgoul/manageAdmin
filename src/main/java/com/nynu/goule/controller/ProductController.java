@@ -61,4 +61,15 @@ public class ProductController extends BaseController {
         return feedback(productService.deleteImages(map));
     }
 
+    @RequestMapping("/getProductById")
+    public ModelAndView getProductById(@RequestParam(name = "pageNum", defaultValue = "0") Integer pageNum,
+                                         @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize,
+                                         @RequestParam(name = "id", defaultValue = "") String id){
+        Map<String, Object> map = new HashMap<>();
+        map.put("pageNum",pageNum);
+        map.put("pageSize",pageSize);
+        map.put("id",id);
+        return feedback(productService.getProductById(map));
+    }
+
 }

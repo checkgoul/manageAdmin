@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Column;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class LoginUser {
 
@@ -16,9 +17,8 @@ public class LoginUser {
     private String prsnIdNum;
     private String roleId;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "addTime")
-    private Date addTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Timestamp addTime;
 
     public int getId() {
         return id;
@@ -84,11 +84,12 @@ public class LoginUser {
         this.roleId = roleId;
     }
 
-    public Date getAddTime() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    public Timestamp getAddTime() {
         return addTime;
     }
 
-    public void setAddTime(Date addTime) {
+    public void setAddTime(Timestamp addTime) {
         this.addTime = addTime;
     }
 }
