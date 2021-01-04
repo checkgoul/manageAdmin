@@ -287,11 +287,12 @@ public class ProductServiceImpl implements ProductService {
      * @return
      * @throws IOException
      */
+    @Override
     public Result uploadImages(MultipartFile file) throws IOException {
         Result result = new Result();
         Map<String, Object> imgMap = new HashMap<>();
         File f = null;
-        if(file.equals("")||file.getSize()<=0){
+        if("".equals(file)||file.getSize()<=0){
             file = null;
         }else{
             InputStream ins = file.getInputStream();

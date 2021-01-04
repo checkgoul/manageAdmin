@@ -19,7 +19,7 @@ public class LoginUserController extends BaseController {
     private LoginUserService loginUserService;
 
     @RequestMapping("/login")
-    public ModelAndView UserLogin(@RequestBody Map<String, Object> paramMap,HttpServletRequest request) throws Exception {
+    public ModelAndView userLogin(@RequestBody Map<String, Object> paramMap,HttpServletRequest request) throws Exception {
         return feedback(loginUserService.login(paramMap,request));
     }
 }

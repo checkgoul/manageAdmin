@@ -9,4 +9,6 @@ import java.util.Map;
 @Mapper
 public interface RoleAuthMapper {
     List<Map<String, Object>> queryAuthId(String userId);
+
+    List<Map<String, Object>> getAllRoles();
 }

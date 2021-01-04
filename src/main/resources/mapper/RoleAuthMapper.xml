@@ -8,4 +8,7 @@
         select authId from role_auth where roleId in(select roleId from user_role where userId = #{userId})
     </select>
 
+    <select id="getAllRoles" resultType="java.util.Map">
+        select id, roleId, roleName, superRoleId, description from roles
+    </select>
 </mapper>

@@ -180,7 +180,8 @@ public class CategoryServiceImpl implements CategoryService {
         Map<String ,Object> map = new HashMap<>();
         int id = (int) categoryMap.get("id");
         String mainAcctId = (String) categoryMap.get("username");
-        boolean isAuth = security.checkAccountAuth(mainAcctId,CommonConstants.AUTHID.DELETE);
+        String authType = CommonConstants.AUTHID.DELETE + "," + CommonConstants.AUTHID.CATEGORY_DELETE;
+        boolean isAuth = security.checkAccountAuth(mainAcctId,authType);
         if(isAuth) {
             map.put("id", id);
             //入库操作需要

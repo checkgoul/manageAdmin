@@ -38,14 +38,21 @@ public class Security {
         LoginUser user  = security.loginUserMapper.getUserIdByUserName(mainAcctId);
         String userId = String.valueOf(user.getId());
         List<Map<String, Object>> roleAuth = security.roleAuthMapper.queryAuthId(userId);
+        int same = 0;
         String authMsg = "";
+        String[] roleIds = currentOperation.split(",");
         for(Map<String, Object> authMap : roleAuth){
             authMsg += authMap.get("authId")+",";
         }
-        if(authMsg.contains(currentOperation)) {
-            return true;
-        }else{
+        for(int i = 0; i<roleIds.length; i++){
+            if(authMsg.contains(roleIds[i])){
+                same++;
+            }
+        }
+        if(same == 0){
             return false;
+        }else{
+            return true;
         }
     }
 }

@@ -94,7 +94,7 @@ public class LoginUserServiceImpl implements LoginUserService {
         }
         if(!RegExUtil.isMobile(telPhone)){
             result.setStatus(Result.RTN_CODE.ERROR);
-            result.setMsg("手机号填写错误");
+            result.setMsg("手机号格式错误");
             return result;
         }
         int phoneNum = loginUserMapper.queryPhoneNum(paramMap);
@@ -228,6 +228,12 @@ public class LoginUserServiceImpl implements LoginUserService {
     @Override
     public Result checkPhoneNum(Map<String, Object> map) {
         Result result = new Result();
+        String telPhone = (String) map.get("telPhone");
+        if(!RegExUtil.isMobile(telPhone)){
+            result.setStatus(Result.RTN_CODE.ERROR);
+            result.setMsg("手机号格式错误");
+            return result;
+        }
         int phoneNum = loginUserMapper.queryPhoneNum(map);
         if(phoneNum >= 1){
             result.setMsg("该手机号已注册");
