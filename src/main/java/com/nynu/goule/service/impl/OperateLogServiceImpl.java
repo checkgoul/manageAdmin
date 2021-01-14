@@ -109,11 +109,11 @@ public class OperateLogServiceImpl implements OperateLogService {
     public static String getYearAndMonth(){
         Calendar c = Calendar.getInstance();
         String year = String.valueOf(c.get(Calendar.YEAR));
-        int month = c.get(Calendar.MONTH) + 1;
-        if(month < 10){
-            return year + "0" + month;
-        }else {
+        //int month = c.get(Calendar.MONTH) + 1;
+        //if(month < 10){
+            //return year + "0" + month;
+        //}else {
             return year;
-        }
+        //}
     }
 }

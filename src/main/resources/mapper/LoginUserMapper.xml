@@ -49,7 +49,15 @@
     </select>
 
     <select id="getAllUserInfo" resultType="java.util.Map">
-        select id,username,account_name accountName,telphone,mail,prsnIdNum,birthDay,DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime from users ORDER BY addTime desc
+        select id,username,
+        (CASE WHEN acctStatus = '1' THEN '正常'
+            WHEN acctStatus = '2' THEN '锁定'
+            END ) AS acctStatus,
+        lockReason,
+        (CASE WHEN humanStatus = '1' THEN '在职'
+            WHEN humanStatus = '2' THEN '离职'
+            END ) AS humanStatus,
+        orgaId,account_name accountName,telphone,mail,prsnIdNum,birthDay,DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime from users ORDER BY addTime desc
     </select>
 
     <select id="queryPhoneNum" resultType="java.lang.Integer" parameterType="java.util.Map">
@@ -59,4 +67,19 @@
     <select id="getUserIdByUserName" resultType="com.nynu.goule.pojo.LoginUser" parameterType="String">
         select id from users where username = #{mainAcctId}
     </select>
+
+    <select id="getOldPwd" resultType="com.nynu.goule.pojo.LoginUser" parameterType="java.util.Map">
+        select * from users where username = #{username}
+    </select>
+
+    <update id="updatePwd" parameterType="java.util.Map">
+        update users set password = #{newPwd} where username = #{username}
+    </update>
+
+    <delete id="delUser" parameterType="java.util.Map" >
+        delete from users where id in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

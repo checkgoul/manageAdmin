@@ -3,6 +3,7 @@ package com.nynu.goule.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.nynu.goule.common.Result;
 import com.nynu.goule.mapper.LoginUserMapper;
+import com.nynu.goule.pojo.LoginUser;
 import com.nynu.goule.pojo.OperateLog;
 import com.nynu.goule.service.LoginUserService;
 import com.nynu.goule.service.OperateLogService;
@@ -229,18 +230,136 @@ public class LoginUserServiceImpl implements LoginUserService {
     public Result checkPhoneNum(Map<String, Object> map) {
         Result result = new Result();
         String telPhone = (String) map.get("telPhone");
-        if(!RegExUtil.isMobile(telPhone)){
-            result.setStatus(Result.RTN_CODE.ERROR);
-            result.setMsg("手机号格式错误");
-            return result;
-        }
-        int phoneNum = loginUserMapper.queryPhoneNum(map);
-        if(phoneNum >= 1){
-            result.setMsg("该手机号已注册");
-            result.setStatus(Result.RTN_CODE.ERROR);
-        }else{
-            result.setStatus(Result.RTN_CODE.SUCCESS);
+        if(null != telPhone) {
+            if (!RegExUtil.isMobile(telPhone)) {
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("手机号格式错误");
+                return result;
+            }
+            int phoneNum = loginUserMapper.queryPhoneNum(map);
+            if (phoneNum >= 1) {
+                result.setMsg("该手机号已注册");
+                result.setStatus(Result.RTN_CODE.ERROR);
+            } else {
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+            }
         }
         return result;
+    }
+
+    @Override
+    public Result checkPwd(Map<String, Object> map) {
+        Result result = new Result();
+        //默认密码操作都为正确的
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        if(map.size() != 0) {
+            if (null != map.get("username")) {
+                LoginUser loginUser = loginUserMapper.getOldPwd(map);
+                //数据库中的原密码
+                String oldPwd = loginUser.getPassword();
+                //前端传入原密码
+                String oldPwd1 = (String) map.get("oldPwd");
+                if (null != oldPwd1) {
+                    if ((oldPwd.length() != oldPwd1.length() || !oldPwd.equals(oldPwd1))) {
+                        result.setMsg("原密码输入错误");
+                        result.setStatus(Result.RTN_CODE.ERROR);
+                    }
+                }
+            } else {
+                String newWord = (String) map.get("newPwd");
+                String confirmPwd = (String) map.get("confirmPwd");
+                if(null == newWord || null == confirmPwd){
+                    result.setMsg("请输入新密码");
+                    result.setStatus(Result.RTN_CODE.ERROR);
+                    return result;
+                }
+                if (isContainSpaces("newPwd", map)) {
+                    result.setMsg("密码中不允许含有空格");
+                    result.setStatus(Result.RTN_CODE.ERROR);
+                    return result;
+                }
+                if (newWord.length() != confirmPwd.length() || !newWord.equals(confirmPwd)) {
+                    result.setMsg("两次密码不一致");
+                    result.setStatus(Result.RTN_CODE.ERROR);
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Result updatePwd(Map<String, Object> map) {
+        Result result = new Result();
+        String oldPwd = (String) map.get("oldPwd");
+        String newPwd = (String) map.get("newPwd");
+        String username = (String) map.get("username");
+        int i = loginUserMapper.updatePwd(map);
+        if(1 == i){
+            result.setMsg("密码修改成功");
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+        }else{
+            result.setMsg("密码修改失败");
+            result.setStatus(Result.RTN_CODE.ERROR);
+        }
+        return result;
+    }
+
+    @Override
+    public Result delUser(Map<String, Object> map) {
+        Result result = new Result();
+        Map<String, Object> param = new HashMap<>();
+        //被操作账号ids
+        List<Integer> idList = (List<Integer>) map.get("ids");
+        //被操作账号主账号
+        List<String> accountList = (List<String>) map.get("account");
+        String account = "";
+        //操作人姓名
+        String username = (String) map.get("username");
+        param.put("list",idList);
+        int delNum = loginUserMapper.delUser(param);
+        if(delNum >= 1){
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+            result.setMsg("删除成功");
+            for(int i = 0; i < accountList.size(); i++){
+                account += accountList.get(i) + ",";
+            }
+            //被操作账号的String
+            account = account.substring(0, account.length()-1);
+
+            //记录日志
+            Map<String, Object> operateMap = new HashMap<>();
+            Map<String, Object> beforeMap = new HashMap<>();
+            String msg = "删除主账号操作";
+            beforeMap.put("ids", account);
+            String beforeMsg = JsonUtil.convertObject2Json(beforeMap);
+            operateMap.put("acctId", username);
+            operateMap.put("opType", OperateLog.OP_TYPE.DELETE);
+            operateMap.put("opMenu", OperateLog.OP_PATH.USER_MANAGEMENT);
+            operateMap.put("beforeCntt", beforeMsg);
+            operateMap.put("logCntt", msg);
+            operateLogService.addOperateLog(operateMap);
+        }else{
+            result.setStatus(Result.RTN_CODE.ERROR);
+            result.setMsg("删除失败");
+        }
+        return result;
+    }
+
+    /**
+     * 检验该字段中是否含有空格
+     * @param key
+     * @param map
+     * @return boolean
+     */
+    boolean isContainSpaces(String key, Map<String, Object> map){
+        String value = (String) map.get(key);
+        value.replace(" ","");
+        String value1 = value.replaceAll(" ","");
+        if(value.length() != value1.length()){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
