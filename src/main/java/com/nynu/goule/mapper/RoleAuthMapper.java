@@ -11,4 +11,8 @@ public interface RoleAuthMapper {
     List<Map<String, Object>> queryAuthId(String userId);
 
     List<Map<String, Object>> getAllRoles();
+
+    List<Map<String, Object>> getExistRoleList(Map<String, Object> map);
+
+    List<Map<String, Object>> getAssignableRoleList();
 }

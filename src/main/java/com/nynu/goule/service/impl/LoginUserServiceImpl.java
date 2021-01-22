@@ -125,7 +125,8 @@ public class LoginUserServiceImpl implements LoginUserService {
         }else {
             userInfoMap.put("birthDay","");
         }
-        String password = "nynu@"+username.substring(0,2)+telPhone.substring(7); // password 为 nynu+@+姓名拼音前两位+手机号后四位 例: nynu@wa9321
+        // password 默认为 nynu + @ + 姓名拼音前两位 + 手机号后四位 例: nynu@wa9321
+        String password = "nynu@"+username.substring(0,2)+telPhone.substring(7);
         Timestamp time = DateUtil.getCurrentTimestamp();
         userInfoMap.put("accountName",accountName);
         userInfoMap.put("telPhone",telPhone);
@@ -173,7 +174,8 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("请先输入人员姓名");
             return result;
         }
-        String username = ToPinYin.converterToAllSpell(accountName); //登录的主账号为填写人姓名的拼音 例: 王瑜 -> wangyu 如果拼音相同,则依次递增 -> wangyu1
+        //登录的主账号为填写人姓名的拼音 例: 王瑜 -> wangyu 如果拼音相同,则依次递增 -> wangyu1
+        String username = ToPinYin.converterToAllSpell(accountName);
         List<Map<String, Object>> usernameList = loginUserMapper.queryUsernameCount(username);
         String order = "";
         if(usernameList != null && !usernameList.isEmpty()) {

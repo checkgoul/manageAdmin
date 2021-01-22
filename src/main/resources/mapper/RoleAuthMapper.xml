@@ -11,4 +11,25 @@
     <select id="getAllRoles" resultType="java.util.Map">
         select id, roleId, roleName, superRoleId, description from roles
     </select>
+
+    <select id="getExistRoleList" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            u.account_name,
+            u.username,
+            r.roleName,
+            r.roleId,
+            r.description
+        FROM
+            users u,
+            user_role s,
+            roles r
+        WHERE
+            u.username = #{username}
+        AND u.id = s.userId
+        AND s.roleId = r.roleId
+    </select>
+
+    <select id="getAssignableRoleList" resultType="java.util.Map">
+        SELECT roleName,roleId,description from roles
+    </select>
 </mapper>

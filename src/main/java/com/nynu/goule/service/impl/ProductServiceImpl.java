@@ -160,7 +160,8 @@ public class ProductServiceImpl implements ProductService {
                         afterCntt.put("productName", productName);
                         afterCntt.put("price", price);
                         afterCntt.put("description", description);
-                        String msg = JsonUtil.convertObject2Json(afterCntt); //前端详情展示需要,转json后才能正常显示
+                        //前端详情展示需要,转json后才能正常显示
+                        String msg = JsonUtil.convertObject2Json(afterCntt);
                         String logCntt = "新增商品“" + productName + "”";
                         operateMap.put("acctId", param.get("username"));
                         operateMap.put("opType", OperateLog.OP_TYPE.ADD);
@@ -238,44 +239,52 @@ public class ProductServiceImpl implements ProductService {
         Result result = new Result();
         Map<String, Object> operateMap = new HashMap<>();
         Map<String, Object> param = new HashMap<>();
-        String beforeStatus = "";
-        String afterStatus = "";
-        param.put("id",map.get("id"));
-        param.put("productStatus",map.get("productStatus"));
-        int successNum = productMapper.updateStatusById(param);
-        if(successNum > 0){
-            if(((int)param.get("productStatus") == 1)){
-                result.setMsg("上架成功");
-                result.setStatus(Result.RTN_CODE.SUCCESS);
-                beforeStatus = "下架";
-                afterStatus = "上架";
-            }else {
-                result.setMsg("下架成功");
-                result.setStatus(Result.RTN_CODE.SUCCESS);
-                beforeStatus = "上架";
-                afterStatus = "下架";
-            }
+        String mainAcctId = (String) map.get("username");
+        String authType = CommonConstants.AUTHID.UPDATE + "," + CommonConstants.AUTHID.PRODUCT_UPDATE;
+        boolean isAuth = security.checkAccountAuth(mainAcctId,authType);
+        if(isAuth) {
+            String beforeStatus = "";
+            String afterStatus = "";
+            param.put("id", map.get("id"));
+            param.put("productStatus", map.get("productStatus"));
+            int successNum = productMapper.updateStatusById(param);
+            if (successNum > 0) {
+                if (((int) param.get("productStatus") == 1)) {
+                    result.setMsg("上架成功");
+                    result.setStatus(Result.RTN_CODE.SUCCESS);
+                    beforeStatus = "下架";
+                    afterStatus = "上架";
+                } else {
+                    result.setMsg("下架成功");
+                    result.setStatus(Result.RTN_CODE.SUCCESS);
+                    beforeStatus = "上架";
+                    afterStatus = "下架";
+                }
 
-            //记录操作日志
-            Map<String, Object> productInfoMap = productMapper.getProductInfoById(map);
-            Map<String, Object> beforeMap = new HashMap<>();
-            Map<String, Object> afterMap = new HashMap<>();
-            beforeMap.put("productName",productInfoMap.get("productname"));
-            beforeMap.put("productStatus",beforeStatus);
-            afterMap.put("productName",productInfoMap.get("productname"));
-            afterMap.put("productStatus",afterStatus);
-            String beforeMsg = JsonUtil.convertObject2Json(beforeMap);
-            String afterMsg = JsonUtil.convertObject2Json(afterMap);
-            String productMsg = "更新商品“" + productInfoMap.get("productname") +"”状态";
-            operateMap.put("acctId",map.get("username"));
-            operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
-            operateMap.put("logCntt",productMsg);
-            operateMap.put("opMenu",OperateLog.OP_PATH.PRODUCT_MANAGEMENT);
-            operateMap.put("beforeCntt",beforeMsg);
-            operateMap.put("afterCntt",afterMsg);
-            operateLogService.addOperateLog(operateMap);
+                //记录操作日志
+                Map<String, Object> productInfoMap = productMapper.getProductInfoById(map);
+                Map<String, Object> beforeMap = new HashMap<>();
+                Map<String, Object> afterMap = new HashMap<>();
+                beforeMap.put("productName", productInfoMap.get("productname"));
+                beforeMap.put("productStatus", beforeStatus);
+                afterMap.put("productName", productInfoMap.get("productname"));
+                afterMap.put("productStatus", afterStatus);
+                String beforeMsg = JsonUtil.convertObject2Json(beforeMap);
+                String afterMsg = JsonUtil.convertObject2Json(afterMap);
+                String productMsg = "更新商品“" + productInfoMap.get("productname") + "”状态";
+                operateMap.put("acctId", map.get("username"));
+                operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
+                operateMap.put("logCntt", productMsg);
+                operateMap.put("opMenu", OperateLog.OP_PATH.PRODUCT_MANAGEMENT);
+                operateMap.put("beforeCntt", beforeMsg);
+                operateMap.put("afterCntt", afterMsg);
+                operateLogService.addOperateLog(operateMap);
+            } else {
+                result.setMsg("更新失败");
+                result.setStatus(Result.RTN_CODE.ERROR);
+            }
         }else{
-            result.setMsg("更新失败");
+            result.setMsg("您没有当前操作权限");
             result.setStatus(Result.RTN_CODE.ERROR);
         }
         return result;

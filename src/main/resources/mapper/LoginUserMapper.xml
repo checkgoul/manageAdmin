@@ -5,7 +5,22 @@
 <mapper namespace="com.nynu.goule.mapper.LoginUserMapper">
 
     <select id="login" parameterType="java.util.Map" resultType="java.util.Map">
-        select * from users where username=#{username}
+        select s.id,username, password,
+        (CASE WHEN acctStatus = '1' THEN '正常'
+            WHEN acctStatus = '2' THEN '锁定'
+            END ) AS acctStatus,
+        lockReason,
+        (CASE WHEN humanStatus = '1' THEN '在职'
+            WHEN humanStatus = '2' THEN '离职'
+            END ) AS humanStatus,
+        (CASE WHEN sex = '1' THEN '男'
+            WHEN sex = '2' THEN '女'
+            END ) AS sex,
+            account_name accountName,telphone,mail,prsnIdNum,birthDay,DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime, o.orgaName orgaName
+        from
+            users s, orgainfo o
+        where
+            s.orgaId = o.orgaId and username=#{username}
     </select>
 
     <insert id="addUser" parameterType="java.util.Map">
@@ -49,7 +64,7 @@
     </select>
 
     <select id="getAllUserInfo" resultType="java.util.Map">
-        select id,username,
+        select s.id,username,
         (CASE WHEN acctStatus = '1' THEN '正常'
             WHEN acctStatus = '2' THEN '锁定'
             END ) AS acctStatus,
@@ -57,7 +72,10 @@
         (CASE WHEN humanStatus = '1' THEN '在职'
             WHEN humanStatus = '2' THEN '离职'
             END ) AS humanStatus,
-        orgaId,account_name accountName,telphone,mail,prsnIdNum,birthDay,DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime from users ORDER BY addTime desc
+        (CASE WHEN sex = '1' THEN '男'
+            WHEN sex = '2' THEN '女'
+            END ) AS sex,
+            account_name accountName,telphone,mail,prsnIdNum,birthDay,DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime, o.orgaName orgaName from users s, orgainfo o where s.orgaId = o.orgaId ORDER BY addTime desc
     </select>
 
     <select id="queryPhoneNum" resultType="java.lang.Integer" parameterType="java.util.Map">

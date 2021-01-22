@@ -126,10 +126,12 @@ public class CategoryServiceImpl implements CategoryService {
         String categoryName = (String) categoryMap.get("categoryName");
         String mainAcctId = (String) categoryMap.get("username");
         map.put("id",id);
-        boolean isAuth = security.checkAccountAuth(mainAcctId,CommonConstants.AUTHID.UPDATE);
+        String authType = CommonConstants.AUTHID.UPDATE + "," + CommonConstants.AUTHID.CATEGORY_UPDATE;
+        boolean isAuth = security.checkAccountAuth(mainAcctId,authType);
         if(isAuth) {
             Category category = categoryMapper.getCategoryNameById(map);
-            String beforeCategoryName = category.getCategoryName(); //删除前的名称
+            //删除前的名称
+            String beforeCategoryName = category.getCategoryName();
             int num = categoryMapper.queryCategoryNum(categoryName);
             if (num >= 1) {
                 result.setStatus(Result.RTN_CODE.ERROR);
