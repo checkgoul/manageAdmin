@@ -100,4 +100,8 @@
             #{item}
         </foreach>
     </delete>
+
+    <select id="checkLock" resultType="int" parameterType="string">
+        select count(*) from users where username=#{username} and acctStatus = '2'
+    </select>
 </mapper>

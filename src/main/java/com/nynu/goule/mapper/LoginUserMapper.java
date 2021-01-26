@@ -32,4 +32,6 @@ public interface LoginUserMapper {
     int updatePwd(Map<String, Object> map);
 
     int delUser(Map<String, Object> map);
+
+    int checkLock(String username);
 }

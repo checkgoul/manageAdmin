@@ -65,7 +65,8 @@ public class CategoryServiceImpl implements CategoryService {
         String categoryName = (String) categoryMap.get("categoryName");
         String parentId = (String) categoryMap.get("parentId");
         String mainAcctId = (String) categoryMap.get("username");
-        boolean isAuth = security.checkAccountAuth(mainAcctId, CommonConstants.AUTHID.INSERT);
+        String authType = CommonConstants.AUTHID.INSERT + "," + CommonConstants.AUTHID.CATEGORY_INSERT;
+        boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
         if(isAuth) {
             if (!categoryName.isEmpty() && !"".equals(categoryName) && (categoryName.length() < 20)) {
                 int num = categoryMapper.queryCategoryNum(categoryName);
@@ -190,7 +191,8 @@ public class CategoryServiceImpl implements CategoryService {
             Category category = categoryMapper.getCategoryNameById(map);
             Category category1 = categoryMapper.getCategoryParentIdById(map);
             String parentId1 = category1.getParentId();
-            String beforeCategoryName = category.getCategoryName(); //删除前的名称
+            //删除前的名称
+            String beforeCategoryName = category.getCategoryName();
             int num = categoryMapper.queryCategoryNumById(id);
             if (num <= 0) {
                 result.setMsg("删除失败");
@@ -198,8 +200,10 @@ public class CategoryServiceImpl implements CategoryService {
                 return result;
             } else {
                 String parentId = Integer.toString(id);
-                int secondCategoryNum = categoryMapper.queryCategoryNumByParentId(parentId); // 父集下存在子集
-                int categoryChildNum = productMapper.queryCategoryChildNumByParentId(parentId); // 子集下存在商品
+                // 父集下存在子集
+                int secondCategoryNum = categoryMapper.queryCategoryNumByParentId(parentId);
+                // 子集下存在商品
+                int categoryChildNum = productMapper.queryCategoryChildNumByParentId(parentId);
                 if (secondCategoryNum >= 1 || categoryChildNum >= 1) {
                     result.setMsg("存在子分类,不可删除");
                     result.setStatus(Result.RTN_CODE.ERROR);

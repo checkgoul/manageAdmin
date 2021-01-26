@@ -15,7 +15,15 @@ public interface RoleService {
 
     /**
      * 根据账号去查询当前账号的可赋角色和已有角色
+     * @param param
      * @return
      */
     Result getAccountRoles(Map<String, Object> param);
+
+    /**
+     * 删除或者新增账号角色
+     * @param param
+     * @return
+     */
+    Result updAcctRoles(Map<String, Object> param);
 }

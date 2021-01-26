@@ -14,8 +14,6 @@
 
     <select id="getExistRoleList" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
-            u.account_name,
-            u.username,
             r.roleName,
             r.roleId,
             r.description
@@ -31,5 +29,33 @@
 
     <select id="getAssignableRoleList" resultType="java.util.Map">
         SELECT roleName,roleId,description from roles
+    </select>
+
+    <select id="getOldRoleList" resultType="String" parameterType="java.util.Map">
+        SELECT
+            r.roleId
+        FROM
+            users u,
+            user_role s,
+            roles r
+        WHERE
+            u.username = #{username}
+        AND u.id = s.userId
+        AND s.roleId = r.roleId
+    </select>
+
+    <insert id="addAcctRoles" parameterType="java.util.Map">
+            insert into user_role (userId, roleId) values ( #{userId}, #{roleId} )
+    </insert>
+
+    <delete id="delAcctRoles" parameterType="java.util.Map">
+            delete from user_role where userId = #{userId} and roleId = #{roleId}
+    </delete>
+
+    <select id="findRoleNameById" parameterType="java.util.Map" resultType="String">
+        select roleName from roles where roleId in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 </mapper>

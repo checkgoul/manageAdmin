@@ -15,4 +15,12 @@ public interface RoleAuthMapper {
     List<Map<String, Object>> getExistRoleList(Map<String, Object> map);
 
     List<Map<String, Object>> getAssignableRoleList();
+
+    List<String> getOldRoleList(Map<String, Object> map);
+
+    void addAcctRoles(Map<String, Object> insertMap);
+
+    void delAcctRoles(Map<String, Object> insertMap);
+
+    List<String> findRoleNameById(List<String> diffList);
 }

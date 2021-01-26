@@ -80,7 +80,8 @@ public class ProductServiceImpl implements ProductService {
     public Result queryProductByIndex(int pageNum, int pageSize, String productName, String description) {
         Result result = new Result();
         Map<String, Object> param = new HashMap<>();
-        String productName1 = productName.replace(" ",""); // 对搜索框去空格处理
+        // 对搜索框去空格处理
+        String productName1 = productName.replace(" ","");
         String description1 = description.replace(" ","");
         param.put("productName", productName1);
         param.put("description", description1);
@@ -89,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
         PageHelper.startPage(pageNum, pageSize);
         List<Product> products = productMapper.queryProductByIndex(param);
         PageInfo<Product> pageInfo = new PageInfo<>(products);
-        if (!(products.size() == 0)) {
+        if (products.size() != 0) {
             result.setData(pageInfo);
             result.setStatus(Result.RTN_CODE.SUCCESS);
         } else {
@@ -105,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
      * @return
      */
     @Override
-    public Result addAndUpdateProduct(Map<String, Object> param) {
+    public Result addOrUpdateProduct(Map<String, Object> param) {
         Map<String, Object> map = (Map<String, Object>) param.get("product");
         Result result = new Result();
         Map<String, Object> operateMap = new HashMap<>();
@@ -123,7 +124,8 @@ public class ProductServiceImpl implements ProductService {
             imgs += imgList.get(i).toString() + ",";
         }
         if(null == map.get("id")) {
-            boolean isAuth = security.checkAccountAuth(mainAcctId, CommonConstants.AUTHID.INSERT);
+            String authType = CommonConstants.AUTHID.INSERT + CommonConstants.AUTHID.PRODUCT_INSERT;
+            boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
             if(isAuth){
                 if (null == map.get("categoryId")) {
                     result.setMsg("一级分类下不可添加商品");
@@ -179,7 +181,8 @@ public class ProductServiceImpl implements ProductService {
                 result.setMsg("您没有当前操作权限");
             }
         }else {
-            boolean isAuth = security.checkAccountAuth(mainAcctId, CommonConstants.AUTHID.UPDATE);
+            String authType = CommonConstants.AUTHID.UPDATE + CommonConstants.AUTHID.PRODUCT_UPDATE;
+            boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
             if (isAuth) {
                 map.put("imgs", imgs);
                 List<Map<String, Object>> productInfoMap = productMapper.getProductInfoByIdNew(map);

@@ -37,7 +37,7 @@ public class ProductController extends BaseController {
 
     @RequestMapping("/addOrUpdate")
     public ModelAndView addOrUpdateProduct(@RequestBody Map<String, Object> map) throws GeneralSecurityException {
-        return feedback(productService.addAndUpdateProduct(map));
+        return feedback(productService.addOrUpdateProduct(map));
     }
 
     @RequestMapping("/del")

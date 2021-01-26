@@ -37,6 +37,8 @@ public class LoginUserServiceImpl implements LoginUserService {
         String username = ValidateUtil.isBlankParam(paramMap, "username", "用户名");
         String password = ValidateUtil.isBlankParam(paramMap, "password", "密码");
         String verification1 = ValidateUtil.isBlankParam(paramMap, "verification", "验证码");
+        String addr = request.getRemoteAddr();
+        System.err.println("addr : " + addr);
         // 从session中取验证码
         String checkCode1 = (String) request.getSession().getAttribute("verifyCode");
         if(StringUtil.isEmpty(checkCode1)) {
@@ -52,6 +54,13 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("验证码错误!");
             return result;
         } else {
+            //查询账号是否已经锁定
+            int lockNum = loginUserMapper.checkLock(username);
+            if(lockNum == 1){
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("该账号已锁定,请联系管理员");
+                return result;
+            }
             Map<String, Object> rtnMap = loginUserMapper.login(username);
             String realPwd = null;
             if (!CollectionUtils.isEmpty(rtnMap) && rtnMap.size() > 0) {
