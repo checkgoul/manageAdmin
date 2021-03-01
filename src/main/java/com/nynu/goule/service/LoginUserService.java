@@ -40,4 +40,8 @@ public interface LoginUserService {
      * @return
      */
     Result delUser(Map<String, Object> map);
+
+    Result lockUser(Map<String, Object> map);
+
+    Result breakLock(Map<String, Object> map);
 }

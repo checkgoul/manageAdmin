@@ -34,4 +34,8 @@ public interface LoginUserMapper {
     int delUser(Map<String, Object> map);
 
     int checkLock(String username);
+
+    int lockUser(Map<String, Object> param);
+
+    int breakLock(Map<String, Object> map);
 }

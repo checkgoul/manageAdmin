@@ -357,6 +357,52 @@ public class LoginUserServiceImpl implements LoginUserService {
         return result;
     }
 
+    @Override
+    public Result lockUser(Map<String, Object> map) {
+        Result result = new Result();
+        List<Integer> ids = (List<Integer>) map.get("ids");
+        List<String> account = (List<String>) map.get("account");
+        String username = (String) map.get("username");
+        String lockReason = (String) map.get("lockReason");
+        Map<String, Object> param = new HashMap<>();
+        param.put("ids",ids);
+        param.put("lockReason",lockReason);
+        if(StringUtil.isNotEmpty(lockReason)){
+            int lockNum = loginUserMapper.lockUser(param);
+            if(lockNum >= 1){
+                result.setMsg("锁定成功");
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+            }else{
+                result.setMsg("锁定失败");
+                result.setStatus(Result.RTN_CODE.ERROR);
+            }
+        }else{
+            result.setMsg("锁定原因不能为空");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }
+        return result;
+    }
+
+    @Override
+    public Result breakLock(Map<String, Object> map) {
+        Result result = new Result();
+        List<Integer> ids = (List<Integer>) map.get("ids");
+        List<String> account = (List<String>) map.get("account");
+        String username = (String) map.get("username");
+        Map<String, Object> param = new HashMap<>();
+        param.put("ids",ids);
+        int breakLockNum = loginUserMapper.breakLock(param);
+        if(breakLockNum >= 1){
+            result.setMsg("解锁成功");
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+        }else{
+            result.setMsg("解锁失败");
+            result.setStatus(Result.RTN_CODE.ERROR);
+        }
+        return result;
+    }
+
     /**
      * 检验该字段中是否含有空格
      * @param key

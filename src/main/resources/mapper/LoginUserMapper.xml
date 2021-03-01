@@ -104,4 +104,18 @@
     <select id="checkLock" resultType="int" parameterType="string">
         select count(*) from users where username=#{username} and acctStatus = '2'
     </select>
+
+    <update id="lockUser" parameterType="map">
+        update users set lockReason = #{lockReason}, acctStatus = '2' where
+        <foreach collection="ids" index="index" item="item" open="(" close=")" separator="or">
+            id = #{item}
+        </foreach>
+    </update>
+
+    <update id="breakLock" parameterType="map">
+        update users set acctStatus = '1', lockReason = '' where
+        <foreach collection="ids" index="index" item="item" open="(" close=")" separator="or">
+            id = #{item}
+        </foreach>
+    </update>
 </mapper>

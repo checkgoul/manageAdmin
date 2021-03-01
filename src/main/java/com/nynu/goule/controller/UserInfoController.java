@@ -54,4 +54,14 @@ public class UserInfoController extends BaseController {
     public ModelAndView delUser(@RequestBody Map<String,Object> map){
         return feedback(loginUserService.delUser(map));
     }
+
+    @RequestMapping("/lockUser")
+    public ModelAndView lockUser(@RequestBody Map<String, Object> map){
+        return feedback(loginUserService.lockUser(map));
+    }
+
+    @RequestMapping("/breakLock")
+    public ModelAndView breakLock(@RequestBody Map<String, Object> map){
+        return feedback(loginUserService.breakLock(map));
+    }
 }
