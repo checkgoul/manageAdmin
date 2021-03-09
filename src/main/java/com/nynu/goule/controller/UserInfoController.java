@@ -64,4 +64,9 @@ public class UserInfoController extends BaseController {
     public ModelAndView breakLock(@RequestBody Map<String, Object> map){
         return feedback(loginUserService.breakLock(map));
     }
+
+    @RequestMapping("/resetPwd")
+    public ModelAndView resetPwd(@RequestBody Map<String, Object> map){
+        return feedback(loginUserService.resetPwd(map));
+    }
 }

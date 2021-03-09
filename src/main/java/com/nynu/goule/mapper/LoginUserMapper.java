@@ -38,4 +38,8 @@ public interface LoginUserMapper {
     int lockUser(Map<String, Object> param);
 
     int breakLock(Map<String, Object> map);
+
+    int resetPwd(Map<String, Object> map);
+
+    List<Map<String, Object>> queryUserInfoById(Map<String, Object> map);
 }

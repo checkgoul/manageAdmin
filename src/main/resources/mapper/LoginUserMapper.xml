@@ -118,4 +118,17 @@
             id = #{item}
         </foreach>
     </update>
+
+    <update id="resetPwd" parameterType="map">
+        <foreach collection="list" index="index" item="item" separator=";">
+            update users set password = #{item.password} where id = #{item.id}
+        </foreach>
+    </update>
+
+    <select id="queryUserInfoById" parameterType="map" resultType="map">
+        select id, username, telphone from users where
+        <foreach collection="ids" index="index" item="item" open="(" close=")" separator="or">
+            id = #{item}
+        </foreach>
+    </select>
 </mapper>

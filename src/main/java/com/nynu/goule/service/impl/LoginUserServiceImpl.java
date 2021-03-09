@@ -10,6 +10,7 @@ import com.nynu.goule.service.OperateLogService;
 import com.nynu.goule.utils.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import sun.misc.Cleaner;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -399,6 +400,38 @@ public class LoginUserServiceImpl implements LoginUserService {
         }else{
             result.setMsg("解锁失败");
             result.setStatus(Result.RTN_CODE.ERROR);
+        }
+        return result;
+    }
+
+    @Override
+    public Result resetPwd(Map<String, Object> map) {
+        Result result = new Result();
+        Map<String, Object> inMap = new HashMap<>();
+        List<Map<String, Object>> inList = new ArrayList<>();
+        List<Map<String, Object>> userList = loginUserMapper.queryUserInfoById(map);
+        Iterator<Map<String, Object>> iterator = userList.iterator();
+        while (iterator.hasNext()){
+            Map<String, Object> itMap = iterator.next();
+            String username = (String) itMap.get("username");
+            String telphone = (String) itMap.get("telphone");
+            String password = "nynu@" + username.substring(0,2) + telphone.substring(7,11);
+            itMap.put("password",password);
+            inList.add(itMap);
+            iterator.remove();
+        }
+        inMap.put("list",inList);
+        try{
+            int num = loginUserMapper.resetPwd(inMap);
+            if(num >= 0) {
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+                result.setMsg("密码重置成功");
+            }else {
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("密码重置失败");
+            }
+        }catch (Exception e){
+            throw e;
         }
         return result;
     }
