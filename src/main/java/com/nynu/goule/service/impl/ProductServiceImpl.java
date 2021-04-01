@@ -124,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
             imgs += imgList.get(i).toString() + ",";
         }
         if(null == map.get("id")) {
-            String authType = CommonConstants.AUTHID.INSERT + CommonConstants.AUTHID.PRODUCT_INSERT;
+            String authType = CommonConstants.AUTHID.INSERT + "," + CommonConstants.AUTHID.PRODUCT_INSERT;
             boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
             if(isAuth){
                 if (null == map.get("categoryId")) {
@@ -181,7 +181,7 @@ public class ProductServiceImpl implements ProductService {
                 result.setMsg("您没有当前操作权限");
             }
         }else {
-            String authType = CommonConstants.AUTHID.UPDATE + CommonConstants.AUTHID.PRODUCT_UPDATE;
+            String authType = CommonConstants.AUTHID.UPDATE + "," + CommonConstants.AUTHID.PRODUCT_UPDATE;
             boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
             if (isAuth) {
                 map.put("imgs", imgs);
@@ -276,7 +276,7 @@ public class ProductServiceImpl implements ProductService {
                 String afterMsg = JsonUtil.convertObject2Json(afterMap);
                 String productMsg = "更新商品“" + productInfoMap.get("productname") + "”状态";
                 operateMap.put("acctId", map.get("username"));
-                operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
+                operateMap.put("opType", "8");
                 operateMap.put("logCntt", productMsg);
                 operateMap.put("opMenu", OperateLog.OP_PATH.PRODUCT_MANAGEMENT);
                 operateMap.put("beforeCntt", beforeMsg);

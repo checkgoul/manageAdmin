@@ -42,4 +42,8 @@ public interface LoginUserMapper {
     int resetPwd(Map<String, Object> map);
 
     List<Map<String, Object>> queryUserInfoById(Map<String, Object> map);
+
+    List<Map<String, Object>> getOrgaInfo();
+
+    String getOrgaIdByOrgaName(String orgaName);
 }

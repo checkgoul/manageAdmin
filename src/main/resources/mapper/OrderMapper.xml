@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nynu.goule.mapper.OrderMapper">
+
+<select id="getAllOrder" resultType="map" parameterType="map">
+    select id, orderId, customer, price,
+    DATE_FORMAT(createTime,'%Y-%m-%d %H:%i:%s') createTime,
+    (CASE WHEN isReady = '1' THEN '备货中'
+    WHEN isReady = '2' THEN '已出库'
+    WHEN isReady = '3' THEN '待发货'
+    WHEN isReady = '4' THEN '已发货'
+    END ) AS isReady,
+    (CASE WHEN orderFlow = '1' THEN '订货单'
+    WHEN orderFlow = '2' THEN '退货单'
+    END) AS orderFlow,
+    (CASE WHEN orderState = '1' THEN '待出库审核'
+    WHEN orderState = '2' THEN '快递在路上'
+    WHEN orderState = '3' THEN '待收货确认'
+    END) AS orderState,
+    (CASE WHEN payment = '1' THEN '未收款'
+    WHEN payment = '2' THEN '已付款'
+    WHEN payment = '3' THEN '未退款'
+    WHEN payment = '4' THEN '已退款'
+    END) AS payment
+    from orders where orderFlow = #{orderFlow}
+</select>
+
+</mapper>

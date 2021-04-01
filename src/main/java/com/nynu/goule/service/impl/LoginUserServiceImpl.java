@@ -93,9 +93,17 @@ public class LoginUserServiceImpl implements LoginUserService {
         String username = ValidateUtil.isBlankParam(paramMap,"username","主账号");
         String mail = (String) paramMap.get("mail");
         String prsnIdNum = (String) paramMap.get("prsnIdNum");
+        String sex = ValidateUtil.isBlankParam(paramMap,"sex","性别");
+        String orgaId; // 组织机构id
+        List<String> orgaList = (List<String>) paramMap.get("orgaName");
         if("人员姓名不能为空".equals(accountName)){
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg(accountName);
+            return result;
+        }
+        if("性别不能为空".equals(sex)){
+            result.setStatus(Result.RTN_CODE.ERROR);
+            result.setMsg(sex);
             return result;
         }
         if("手机号不能为空".equals(telPhone)){
@@ -113,6 +121,14 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("该手机号已注册");
             result.setStatus(Result.RTN_CODE.ERROR);
             return result;
+        }
+        if(orgaList.size() == 0){
+            result.setMsg("请选择所属组织");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }else{
+            String orgaName = orgaList.get(0);
+            orgaId = loginUserMapper.getOrgaIdByOrgaName(orgaName);
         }
         if (StringUtil.isNotEmpty(mail)){
             if(RegExUtil.isEmail(mail)){
@@ -141,6 +157,8 @@ public class LoginUserServiceImpl implements LoginUserService {
         userInfoMap.put("accountName",accountName);
         userInfoMap.put("telPhone",telPhone);
         userInfoMap.put("prsnIdNum",prsnIdNum);
+        userInfoMap.put("sex",sex);
+        userInfoMap.put("orgaId",orgaId);
         userInfoMap.put("username",username);
         userInfoMap.put("password",password);
         userInfoMap.put("addTime",time);
@@ -150,9 +168,14 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("添加用户信息成功");
 
             //记录操作日志
+            String sexs = ChooseToUse("性别",sex);
+            //获取组织信息用于插入日志
+
             Map<String, Object> operateMap = new HashMap<>();
             Map<String, Object> afterCntt = new HashMap<>();
             afterCntt.put("acctId",accountName);
+            afterCntt.put("sex",sexs);
+            afterCntt.put("orgaId",orgaId);
             afterCntt.put("telPhone",telPhone.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
             if("".equals(prsnIdNum) || null == prsnIdNum){
                 afterCntt.put("prsnIdNum","");
@@ -198,7 +221,7 @@ public class LoginUserServiceImpl implements LoginUserService {
                 }
                 boolean flag = finalUsername.matches("^[0-9]*$");
                 if(flag){
-                    if(order == ""){
+                    if("".equals(order)){
                         order = finalUsername;
                     } else{
                         order = order + "," + finalUsername;
@@ -436,6 +459,15 @@ public class LoginUserServiceImpl implements LoginUserService {
         return result;
     }
 
+    @Override
+    public Result getOrgaInfo() {
+        Result result = new Result();
+        List<Map<String, Object>> orgaList = loginUserMapper.getOrgaInfo();
+        result.setData(orgaList);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
     /**
      * 检验该字段中是否含有空格
      * @param key
@@ -451,5 +483,28 @@ public class LoginUserServiceImpl implements LoginUserService {
         }else{
             return false;
         }
+    }
+
+    /**
+     *
+     * @param type
+     * @param value
+     * @return
+     */
+    private String ChooseToUse(String type, String value){
+        String res = "";
+        if("性别".equals(type)){
+            switch (value){
+                case "1":
+                    res = "男";
+                    break;
+                case "2":
+                    res = "女";
+                    break;
+                default:
+                    res = "其他";
+            }
+        }
+        return res;
     }
 }

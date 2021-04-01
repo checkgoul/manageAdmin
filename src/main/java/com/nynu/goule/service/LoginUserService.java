@@ -46,4 +46,6 @@ public interface LoginUserService {
     Result breakLock(Map<String, Object> map);
 
     Result resetPwd(Map<String, Object> map);
+
+    Result getOrgaInfo();
 }

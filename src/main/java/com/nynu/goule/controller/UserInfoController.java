@@ -69,4 +69,9 @@ public class UserInfoController extends BaseController {
     public ModelAndView resetPwd(@RequestBody Map<String, Object> map){
         return feedback(loginUserService.resetPwd(map));
     }
+
+    @RequestMapping("/getOrgaInfo")
+    public ModelAndView getOrgaInfo(){
+        return feedback(loginUserService.getOrgaInfo());
+    }
 }

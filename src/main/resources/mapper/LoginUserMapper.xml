@@ -29,6 +29,8 @@
         password,
         account_name,
         telphone,
+        sex,
+        orgaId,
         <if test="mail != null and mail != ''">
             mail,
         </if>
@@ -45,6 +47,8 @@
         #{password},
         #{accountName},
         #{telPhone},
+        #{sex},
+        #{orgaId},
         <if test="mail != null and mail != ''">
             #{mail},
         </if>
@@ -130,5 +134,13 @@
         <foreach collection="ids" index="index" item="item" open="(" close=")" separator="or">
             id = #{item}
         </foreach>
+    </select>
+
+    <select id="getOrgaInfo" parameterType="map" resultType="map">
+        select * from orgainfo
+    </select>
+
+    <select id="getOrgaIdByOrgaName" parameterType="string" resultType="string">
+        select orgaId from orgainfo where orgaName = #{orgaName}
     </select>
 </mapper>
