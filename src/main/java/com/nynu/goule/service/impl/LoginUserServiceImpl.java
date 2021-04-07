@@ -96,6 +96,83 @@ public class LoginUserServiceImpl implements LoginUserService {
         String sex = ValidateUtil.isBlankParam(paramMap,"sex","性别");
         String orgaId; // 组织机构id
         List<String> orgaList = (List<String>) paramMap.get("orgaName");
+        if(orgaList.size() == 0){
+            result.setMsg("请选择所属组织");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }else{
+            String orgaName = orgaList.get(0);
+            orgaId = loginUserMapper.getOrgaIdByOrgaName(orgaName);
+        }
+        //通过主账号查询看是否为修改  因为前台生成的主账号一定是唯一的  如果重复则说明是修改操作
+        int acctNum = loginUserMapper.queryAcctNum(paramMap);
+        //修改操作
+        if(1 == acctNum){
+            //通过主账号去查询该账号下的所有数据，进行比对然后修改
+            List<Map<String, Object>> userInfo = loginUserMapper.queryUserInfoByAcct(paramMap);
+            //目前能够修改的有 性别、手机号、组织机构、邮箱、身份证号
+            String sexOld = (String) userInfo.get(0).get("sex");
+            String phoneOld = (String) userInfo.get(0).get("telphone");
+            String orgaIdOld = (String) userInfo.get(0).get("orgaId");
+            String mailOld = (String) userInfo.get(0).get("mail");
+            String prsnIdNumOld = (String) userInfo.get(0).get("prsnIdNum");
+            String birthDayOld = (String) userInfo.get(0).get("birthDay");
+            for (Map<String, Object> users : userInfo){
+                //做判断时，先判断传入的值是否为空，其次判断新值与旧值是否一样，最后判断新值是否可以重复，若条件都满足则修改。
+                if(!sex.equals(users.get("sex"))){
+                    sexOld = sex;
+                }
+                if(!StringUtil.isEmpty(paramMap.get("telPhone")) && !telPhone.equals(users.get("telphone"))){
+                    //判断新的手机号是否重复
+                    int phoneNum = loginUserMapper.queryPhoneNum(paramMap);
+                    if(phoneNum > 0){
+                        result.setMsg("该手机号已注册");
+                        result.setStatus(Result.RTN_CODE.ERROR);
+                        return result;
+                    }else{
+                        phoneOld = (String) paramMap.get("telPhone");
+                    }
+                }
+                if(!orgaId.equals(users.get("orgaId"))){
+                    orgaIdOld = orgaId;
+                }
+                if(StringUtil.isEmpty(mail) || !mail.equals(users.get("mail"))){
+                    mailOld = mail;
+                }
+                if(StringUtil.isEmpty(prsnIdNum) || !prsnIdNum.equals(users.get("prsnIdNum"))){
+                    if(StringUtil.isEmpty(prsnIdNum)){
+                        prsnIdNumOld = prsnIdNum;
+                    } else if(RegExUtil.isCredNum(prsnIdNum)) {
+                        birthDayOld = prsnIdNum.substring(6, 10) + "-" + prsnIdNum.substring(10, 12) + "-" + prsnIdNum.substring(12, 14);
+                        prsnIdNumOld = prsnIdNum;
+                    }else{
+                        result.setStatus(Result.RTN_CODE.ERROR);
+                        result.setMsg("身份证格式错误");
+                        return result;
+                    }
+                }
+            }
+            Map<String, Object> userMapUpd = new HashMap<>();
+            userMapUpd.put("telPhone",phoneOld);
+            userMapUpd.put("sex",ChooseToUse("reverseSex",sexOld));
+            userMapUpd.put("orgaId",orgaIdOld);
+            userMapUpd.put("mail",mailOld);
+            userMapUpd.put("prsnIdNum",prsnIdNumOld);
+            userMapUpd.put("birthDay",birthDayOld);
+            userMapUpd.put("username",username);
+            int updNum = loginUserMapper.updateUserInfo(userMapUpd);
+            if(updNum > 0){
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+                result.setMsg("修改成功");
+            }else{
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("修改失败");
+            }
+            return result;
+
+            //记录日志操作
+
+        }
         if("人员姓名不能为空".equals(accountName)){
             result.setStatus(Result.RTN_CODE.ERROR);
             result.setMsg(accountName);
@@ -121,14 +198,6 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("该手机号已注册");
             result.setStatus(Result.RTN_CODE.ERROR);
             return result;
-        }
-        if(orgaList.size() == 0){
-            result.setMsg("请选择所属组织");
-            result.setStatus(Result.RTN_CODE.ERROR);
-            return result;
-        }else{
-            String orgaName = orgaList.get(0);
-            orgaId = loginUserMapper.getOrgaIdByOrgaName(orgaName);
         }
         if (StringUtil.isNotEmpty(mail)){
             if(RegExUtil.isEmail(mail)){
@@ -168,7 +237,7 @@ public class LoginUserServiceImpl implements LoginUserService {
             result.setMsg("添加用户信息成功");
 
             //记录操作日志
-            String sexs = ChooseToUse("性别",sex);
+            String sexs = ChooseToUse("sex",sex);
             //获取组织信息用于插入日志
 
             Map<String, Object> operateMap = new HashMap<>();
@@ -493,7 +562,7 @@ public class LoginUserServiceImpl implements LoginUserService {
      */
     private String ChooseToUse(String type, String value){
         String res = "";
-        if("性别".equals(type)){
+        if("sex".equals(type)){
             switch (value){
                 case "1":
                     res = "男";
@@ -503,6 +572,18 @@ public class LoginUserServiceImpl implements LoginUserService {
                     break;
                 default:
                     res = "其他";
+            }
+        }
+        if("reverseSex".equals(type)){
+            switch (value){
+                case "男":
+                    res = "1";
+                    break;
+                case "女":
+                    res = "2";
+                    break;
+                default:
+                    res = "0";
             }
         }
         return res;

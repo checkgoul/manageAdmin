@@ -46,4 +46,10 @@ public interface LoginUserMapper {
     List<Map<String, Object>> getOrgaInfo();
 
     String getOrgaIdByOrgaName(String orgaName);
+
+    int queryAcctNum(Map<String, Object> paramMap);
+
+    List<Map<String, Object>> queryUserInfoByAcct(Map<String, Object> paramMap);
+
+    int updateUserInfo(Map<String, Object> userMapUpd);
 }
