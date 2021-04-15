@@ -177,4 +177,8 @@
             username = #{username}
 
     </update>
+
+    <select id="exportUserInfo" resultType="com.nynu.goule.pojo.LoginUser">
+        select * from users
+    </select>
 </mapper>

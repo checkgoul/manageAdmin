@@ -48,4 +48,6 @@ public interface LoginUserService {
     Result resetPwd(Map<String, Object> map);
 
     Result getOrgaInfo();
+
+    Result exportUserInfo();
 }

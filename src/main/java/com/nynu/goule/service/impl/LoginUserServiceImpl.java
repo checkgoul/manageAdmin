@@ -537,6 +537,14 @@ public class LoginUserServiceImpl implements LoginUserService {
         return result;
     }
 
+    @Override
+    public Result exportUserInfo(){
+        Result result = new Result();
+        List<LoginUser> userInfo = loginUserMapper.exportUserInfo();
+        result.setData(userInfo);
+        return result;
+    }
+
     /**
      * 检验该字段中是否含有空格
      * @param key

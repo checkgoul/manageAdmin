@@ -52,4 +52,6 @@ public interface LoginUserMapper {
     List<Map<String, Object>> queryUserInfoByAcct(Map<String, Object> paramMap);
 
     int updateUserInfo(Map<String, Object> userMapUpd);
+
+    List<LoginUser> exportUserInfo();
 }
