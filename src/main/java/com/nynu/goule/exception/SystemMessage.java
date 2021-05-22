@@ -1,5 +1,8 @@
 package com.nynu.goule.exception;
 
+/**
+ * 异常信息实体类，含有异常状态码和异常信息
+ */
 public class SystemMessage {
     private String Status;
     private String msg;

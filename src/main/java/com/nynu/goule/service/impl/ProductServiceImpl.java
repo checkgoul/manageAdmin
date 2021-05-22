@@ -276,7 +276,7 @@ public class ProductServiceImpl implements ProductService {
                 String afterMsg = JsonUtil.convertObject2Json(afterMap);
                 String productMsg = "更新商品“" + productInfoMap.get("productname") + "”状态";
                 operateMap.put("acctId", map.get("username"));
-                operateMap.put("opType", "8");
+                operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
                 operateMap.put("logCntt", productMsg);
                 operateMap.put("opMenu", OperateLog.OP_PATH.PRODUCT_MANAGEMENT);
                 operateMap.put("beforeCntt", beforeMsg);

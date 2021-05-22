@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,10 +39,19 @@ public class Security {
     public boolean checkAccountAuth(String mainAcctId, String currentOperation){
         LoginUser user  = security.loginUserMapper.getUserIdByUserName(mainAcctId);
         String userId = String.valueOf(user.getId());
+        //获取当前操作所需的角色id
+        String[] roleIds = currentOperation.split(",");
+        List<String> roleIdList = Arrays.asList(roleIds);
         List<Map<String, Object>> roleAuth = security.roleAuthMapper.queryAuthId(userId);
+        //检验该权限是否有效
+        for(String param : roleIdList){
+            int num = security.roleAuthMapper.getAuthUseful(param);
+            if(num > 0){
+                return true;
+            }
+        }
         int same = 0;
         String authMsg = "";
-        String[] roleIds = currentOperation.split(",");
         for(Map<String, Object> authMap : roleAuth){
             authMsg += authMap.get("authId")+",";
         }

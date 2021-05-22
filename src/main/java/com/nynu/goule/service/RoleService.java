@@ -26,4 +26,30 @@ public interface RoleService {
      * @return
      */
     Result updAcctRoles(Map<String, Object> param);
+
+    /**
+     * 查询所有的权限
+     * @return
+     */
+    Result getAllAuth();
+
+    /**
+     * 修改权限状态
+     * @return
+     */
+    Result updAuthState(Map<String, Object> param);
+
+    /**
+     * 获取该角色下的所有权限
+     * @param map
+     * @return
+     */
+    Result getRoleAuths(Map<String, Object> map);
+
+    /**
+     * 修改某个用户下的角色
+     * @param map
+     * @return
+     */
+    Result updRoleAuths(Map<String, Object> map);
 }

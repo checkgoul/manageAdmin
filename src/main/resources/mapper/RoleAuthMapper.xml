@@ -58,4 +58,69 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="getAllAuth" resultType="map">
+        select id, authId, authName, description,
+        (CASE WHEN useful = '0' THEN '有效'
+        WHEN useful = '1' THEN '无效'
+        END
+            ) AS useful,
+        DATE_FORMAT(addTime,'%Y-%m-%d %H:%i:%s') addTime from authelement
+    </select>
+
+    <update id="updAuthState" parameterType="map">
+        update authelement set useful = #{useful} where id = #{id}
+    </update>
+
+    <select id="getExistAuthList" parameterType="map" resultType="map">
+        SELECT
+            a.authName,
+            a.authId,
+            a.description
+        FROM
+            roles r,
+            role_auth s,
+            authelement a
+        WHERE
+            r.roleId = #{roleId}
+        AND a.authId = s.authId
+        AND s.roleId = r.roleId
+    </select>
+
+    <select id="getAssignableAuthList" resultType="map">
+        select authName, authId, description from authelement
+    </select>
+
+    <select id="getAuthsByRoleId" parameterType="map" resultType="java.lang.String">
+        select
+            a.authId
+        FROM
+            roles r,
+            role_auth s,
+            authelement a
+        WHERE
+            r.roleId = #{roleId}
+        AND a.authId = s.authId
+        AND s.roleId = r.roleId
+    </select>
+
+    <insert id="addRoleAuths" parameterType="map">
+        <foreach collection="diffList" item="item" separator=";">
+            insert into
+                role_auth
+                (roleId, authId)
+            VALUES
+                (#{roleId},#{item})
+        </foreach>
+    </insert>
+
+    <select id="getAuthUseful" parameterType="string" resultType="int">
+        select count(*) from authelement where useful = '1' and authId in (select authId from role_auth where roleId = #{param})
+    </select>
+
+    <delete id="delRoleAuths" parameterType="map">
+        <foreach collection="diffList" item="item" separator=";">
+            delete from role_auth where roleId = #{roleId} and authId = #{item}
+        </foreach>
+    </delete>
 </mapper>

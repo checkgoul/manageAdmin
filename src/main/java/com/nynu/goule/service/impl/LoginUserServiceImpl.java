@@ -25,6 +25,8 @@ public class LoginUserServiceImpl implements LoginUserService {
     @Resource
     private OperateLogService operateLogService;
 
+    Security security = new Security();
+
     /**
      * 用户登录接口
      * @param paramMap
@@ -108,6 +110,15 @@ public class LoginUserServiceImpl implements LoginUserService {
         int acctNum = loginUserMapper.queryAcctNum(paramMap);
         //修改操作
         if(1 == acctNum){
+            //查询当前操作人权限 修改用户
+            String mainAcctId = (String) map.get("username");
+            String authType = CommonConstants.AUTHID.UPDATE + "," + CommonConstants.AUTHID.USER_UPDATE;
+            boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
+            if(!isAuth){
+                result.setMsg("您没有当前操作权限");
+                result.setStatus(Result.RTN_CODE.ERROR);
+                return result;
+            }
             //通过主账号去查询该账号下的所有数据，进行比对然后修改
             List<Map<String, Object>> userInfo = loginUserMapper.queryUserInfoByAcct(paramMap);
             //目前能够修改的有 性别、手机号、组织机构、邮箱、身份证号
@@ -117,6 +128,12 @@ public class LoginUserServiceImpl implements LoginUserService {
             String mailOld = (String) userInfo.get(0).get("mail");
             String prsnIdNumOld = (String) userInfo.get(0).get("prsnIdNum");
             String birthDayOld = (String) userInfo.get(0).get("birthDay");
+            String acctStatus = (String) userInfo.get(0).get("acctStatus");
+            if("锁定".equals(acctStatus)){
+                result.setStatus(Result.RTN_CODE.ERROR);
+                result.setMsg("锁定账户不可修改，请先解锁");
+                return result;
+            }
             for (Map<String, Object> users : userInfo){
                 //做判断时，先判断传入的值是否为空，其次判断新值与旧值是否一样，最后判断新值是否可以重复，若条件都满足则修改。
                 if(!sex.equals(users.get("sex"))){
@@ -168,10 +185,48 @@ public class LoginUserServiceImpl implements LoginUserService {
                 result.setStatus(Result.RTN_CODE.ERROR);
                 result.setMsg("修改失败");
             }
-            return result;
 
             //记录日志操作
+            Map<String, Object> operateMap = new HashMap<>();
+            Map<String, Object> afterCntt = new HashMap<>();
+            Map<String, Object> beforeCntt = new HashMap<>();
+            //操作前用户数据
+            String telphone1 = (String) userInfo.get(0).get("telphone");
+            beforeCntt.put("sex",userInfo.get(0).get("sex"));
+            beforeCntt.put("telPhone",telphone1.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+            beforeCntt.put("orgaId",userInfo.get(0).get("orgaId"));
+            beforeCntt.put("mail",userInfo.get(0).get("mail"));
+            beforeCntt.put("prsnIdNum",userInfo.get(0).get("prsnIdNum"));
+            beforeCntt.put("birthDay",userInfo.get(0).get("birthDay"));
+            //操作后用户数据
+            afterCntt.put("sex",sexOld);
+            afterCntt.put("telPhone",phoneOld.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+            afterCntt.put("orgaId",orgaIdOld);
+            afterCntt.put("mail",mailOld);
+            afterCntt.put("prsnIdNum",prsnIdNumOld);
+            afterCntt.put("birthDay",birthDayOld);
 
+            String beforeMsg = JsonUtil.convertObject2Json(beforeCntt);
+            String afterMsg = JsonUtil.convertObject2Json(afterCntt);
+            String opCntt = "修改用户“" + userMapUpd.get("username") + "”";
+            operateMap.put("acctId",map.get("username"));
+            operateMap.put("opType",OperateLog.OP_TYPE.MODIFY);
+            operateMap.put("opMenu",OperateLog.OP_PATH.USER_MANAGEMENT);
+            operateMap.put("beforeCntt",beforeMsg);
+            operateMap.put("afterCntt",afterMsg);
+            operateMap.put("logCntt",opCntt);
+            operateLogService.addOperateLog(operateMap);
+            return result;
+
+        }
+        //查询当前操作人权限 添加用户
+        String mainAcctId = (String) map.get("username");
+        String authType = CommonConstants.AUTHID.INSERT + "," + CommonConstants.AUTHID.USER_INSERT;
+        boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
+        if(!isAuth){
+            result.setMsg("您没有当前操作权限");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
         }
         if("人员姓名不能为空".equals(accountName)){
             result.setStatus(Result.RTN_CODE.ERROR);
@@ -270,6 +325,7 @@ public class LoginUserServiceImpl implements LoginUserService {
     @Override
     public Result toGetAcctId(Map<String, Object> map) {
         Result result = new Result();
+        //检验传入的姓名是否为空
         String accountName = ValidateUtil.isBlankParam(map,"accountName","人员姓名");
         if("人员姓名不能为空".equals(accountName)){
             result.setStatus(Result.RTN_CODE.ERROR);
@@ -278,18 +334,23 @@ public class LoginUserServiceImpl implements LoginUserService {
         }
         //登录的主账号为填写人姓名的拼音 例: 王瑜 -> wangyu 如果拼音相同,则依次递增 -> wangyu1
         String username = ToPinYin.converterToAllSpell(accountName);
+        //模糊查询数据库中相似的数据
         List<Map<String, Object>> usernameList = loginUserMapper.queryUsernameCount(username);
         String order = "";
         if(usernameList != null && !usernameList.isEmpty()) {
+            //for循环遍历
             for (Map<String, Object> realMap : usernameList) {
                 String finalUsername = (String) realMap.get("username");
+                //数据库内数据长度大于用户名长度的数据会截取一位，用于递增，小于的数据将会被去除
                 if (finalUsername.length() > username.length()) {
                     finalUsername = finalUsername.substring(username.length());
                 }else {
                     continue;
                 }
+                //截取的一位使用正则表达式匹配，防止出现wangyu与wangyue匹配。
                 boolean flag = finalUsername.matches("^[0-9]*$");
                 if(flag){
+                    //将截取到的数字添加到order
                     if("".equals(order)){
                         order = finalUsername;
                     } else{
@@ -303,6 +364,7 @@ public class LoginUserServiceImpl implements LoginUserService {
                 for(int i=0; i< arrs.length; i++){
                     ints[i] = Integer.parseInt(arrs[i]);
                 }
+                //将拿到的数组进行排序，排序后+1赋值给用户名
                 Arrays.sort(ints);
                 username = username + Integer.toString(ints[ints.length - 1] + 1);
             }else{
@@ -412,6 +474,16 @@ public class LoginUserServiceImpl implements LoginUserService {
     @Override
     public Result delUser(Map<String, Object> map) {
         Result result = new Result();
+
+        //查询当前操作人权限 删除用户
+        String mainAcctId = (String) map.get("username");
+        String authType = CommonConstants.AUTHID.DELETE + "," + CommonConstants.AUTHID.USER_DELETE;
+        boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
+        if(!isAuth){
+            result.setMsg("您没有当前操作权限");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }
         Map<String, Object> param = new HashMap<>();
         //被操作账号ids
         List<Integer> idList = (List<Integer>) map.get("ids");
@@ -453,9 +525,19 @@ public class LoginUserServiceImpl implements LoginUserService {
     @Override
     public Result lockUser(Map<String, Object> map) {
         Result result = new Result();
+
+        //查询当前操作人权限 锁定用户
+        String mainAcctId = (String) map.get("username");
+        String authType = CommonConstants.AUTHID.UPDATE + "," + CommonConstants.AUTHID.USER_UPDATE;
+        boolean isAuth = security.checkAccountAuth(mainAcctId, authType);
+        if(!isAuth){
+            result.setMsg("您没有当前操作权限");
+            result.setStatus(Result.RTN_CODE.ERROR);
+            return result;
+        }
+
         List<Integer> ids = (List<Integer>) map.get("ids");
         List<String> account = (List<String>) map.get("account");
-        String username = (String) map.get("username");
         String lockReason = (String) map.get("lockReason");
         Map<String, Object> param = new HashMap<>();
         param.put("ids",ids);
@@ -465,6 +547,27 @@ public class LoginUserServiceImpl implements LoginUserService {
             if(lockNum >= 1){
                 result.setMsg("锁定成功");
                 result.setStatus(Result.RTN_CODE.SUCCESS);
+
+                //记录操作日志
+                Map<String, Object> operateMap = new HashMap<>();
+                Map<String, Object> beforeMap = new HashMap<>();
+                Map<String, Object> afterMap = new HashMap<>();
+                StringBuilder sb = new StringBuilder();
+                for(int i = 0; i < account.size(); i++){
+                    sb.append(account.get(i)).append(",");
+                }
+                String msg = "账号“" + account + "”被锁定";
+                beforeMap.put("acctStatus","正常");
+                afterMap.put("acctStatus","锁定");
+                String beforeMsg = JsonUtil.convertObject2Json(beforeMap);
+                String afterMsg = JsonUtil.convertObject2Json(afterMap);
+                operateMap.put("acctId", mainAcctId);
+                operateMap.put("opType", OperateLog.OP_TYPE.MODIFY);
+                operateMap.put("opMenu", OperateLog.OP_PATH.USER_MANAGEMENT);
+                operateMap.put("beforeCntt", beforeMsg);
+                operateMap.put("afterCntt", afterMsg);
+                operateMap.put("logCntt", msg);
+                operateLogService.addOperateLog(operateMap);
             }else{
                 result.setMsg("锁定失败");
                 result.setStatus(Result.RTN_CODE.ERROR);

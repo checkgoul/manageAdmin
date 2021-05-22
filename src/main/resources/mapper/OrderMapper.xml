@@ -23,7 +23,11 @@
     WHEN payment = '2' THEN '已付款'
     WHEN payment = '3' THEN '未退款'
     WHEN payment = '4' THEN '已退款'
-    END) AS payment
+    END) AS payment,
+    productPrice,
+    productName,
+    telPhone,
+    address
     from orders where orderFlow = #{orderFlow}
 </select>
 

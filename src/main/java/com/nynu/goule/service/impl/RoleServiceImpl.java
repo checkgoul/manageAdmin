@@ -133,6 +133,81 @@ public class RoleServiceImpl implements RoleService {
         return result;
     }
 
+    @Override
+    public Result getAllAuth() {
+        Result result = new Result();
+        List<Map<String, Object>> auths = roleAuthMapper.getAllAuth();
+        result.setData(auths);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Result updAuthState(Map<String, Object> param) {
+        Result result = new Result();
+        String useful = (String) param.get("useful");
+        String username = (String) param.get("username");
+        Integer id = (Integer) param.get("id");
+        param.put("useful",switchWord("authState",useful));
+        int num = roleAuthMapper.updAuthState(param);
+        if(num > 0){
+            result.setMsg("权限状态修改成功");
+            result.setStatus(Result.RTN_CODE.SUCCESS);
+        }else{
+            result.setMsg("权限状态修改失败");
+            result.setStatus(Result.RTN_CODE.ERROR);
+        }
+        return result;
+    }
+
+    @Override
+    public Result getRoleAuths(Map<String, Object> map) {
+        Result result = new Result();
+        String roleId = (String) map.get("roleId");
+        Map<String, Object> resultMap = new HashMap<>();
+        //查询已有权限
+        List<Map<String, Object>> existAuthList = roleAuthMapper.getExistAuthList(map);
+        //查询所有角色
+        List<Map<String, Object>> allAuthList = roleAuthMapper.getAssignableAuthList();
+        resultMap.put("existRoleList",existAuthList);
+        resultMap.put("allRoleList",allAuthList);
+        result.setData(resultMap);
+        result.setStatus(Result.RTN_CODE.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Result updRoleAuths(Map<String, Object> map){
+        Result result = new Result();
+        List<String> newAuthList = (List<String>) map.get("targetKeys");
+        String roleId = (String) map.get("roleId");
+        String username = (String) map.get("operator");
+        List<String> oldAuthList = roleAuthMapper.getAuthsByRoleId(map);
+        boolean isAdd = (newAuthList.size() > oldAuthList.size()) ? true : false;
+        if(isAdd){
+            List<String> diffList = findDiff(newAuthList,oldAuthList);
+            Map<String, Object> insertMap = new HashMap<>();
+            insertMap.put("roleId",roleId);
+            insertMap.put("diffList",diffList);
+            int num = roleAuthMapper.addRoleAuths(insertMap);
+            if(num > 0){
+                result.setMsg("角色添加权限成功");
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+            }
+        }else{
+            List<String> diffList = findDiff(oldAuthList,newAuthList);
+            Map<String, Object> insertMap = new HashMap<>();
+            insertMap.put("roleId",roleId);
+            insertMap.put("diffList",diffList);
+            int num = roleAuthMapper.delRoleAuths(insertMap);
+            if(num > 0){
+                result.setMsg("角色删除权限成功");
+                result.setStatus(Result.RTN_CODE.SUCCESS);
+            }
+        }
+        return result;
+    }
+
     /**
      * 返回两个list里的不同元素
      * @param list1  //多
@@ -143,10 +218,10 @@ public class RoleServiceImpl implements RoleService {
         List<String> resultList = new ArrayList<>();
         Iterator<String> iterator = list1.iterator();
         while (iterator.hasNext()) {
-            String roleId1 = iterator.next();
+            String param1 = iterator.next();
             for (int i = 0; i < list2.size(); i++) {
-                String roleId2 = list2.get(i);
-                if (roleId1.equals(roleId2)) {
+                String param2 = list2.get(i);
+                if (param1.equals(param2)) {
                     iterator.remove();
                 }
             }
@@ -155,5 +230,22 @@ public class RoleServiceImpl implements RoleService {
             resultList.addAll(list1);
         }
         return resultList;
+    }
+
+    private String switchWord (String type, String name){
+        String value = "";
+        if("authState".equals(type)){
+            switch (name){
+                case "有效":
+                    value = "0";
+                    break;
+                case "无效":
+                    value = "1";
+                    break;
+                default:
+                    value = "2";
+            }
+        }
+        return value;
     }
 }

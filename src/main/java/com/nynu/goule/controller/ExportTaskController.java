@@ -25,7 +25,7 @@ public class ExportTaskController extends BaseController {
     @RequestMapping("/test")
     public Result testExport(Map<String, Object> map){
         Result result = new Result();
-        result.setMsg("导出中，请稍后查看");
+        result.setMsg("导出至桌面中，请稍后查看");
         result.setStatus(Result.RTN_CODE.SUCCESS);
         UserInfoExport t = new UserInfoExport(map, loginUserService);
         Thread thread = new Thread(t);

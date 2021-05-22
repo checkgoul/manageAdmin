@@ -35,4 +35,24 @@ public class RoleController extends BaseController {
     public ModelAndView updAcctRoles(@RequestBody Map<String, Object> param){
         return feedback(roleService.updAcctRoles(param));
     }
+
+    @RequestMapping("/getAllAuth")
+    public ModelAndView getAllAuth(){
+        return feedback(roleService.getAllAuth());
+    }
+
+    @RequestMapping("/updAuthState")
+    public ModelAndView updAuthState(@RequestBody Map<String, Object> param) {
+        return feedback(roleService.updAuthState(param));
+    }
+
+    @RequestMapping("/getRoleAuths")
+    public ModelAndView getRoleAuths(@RequestBody Map<String, Object> map){
+        return feedback(roleService.getRoleAuths(map));
+    }
+
+    @RequestMapping("/updRoleAuths")
+    public ModelAndView updRoleAuths(@RequestBody Map<String, Object> map){
+        return feedback(roleService.updRoleAuths(map));
+    }
 }

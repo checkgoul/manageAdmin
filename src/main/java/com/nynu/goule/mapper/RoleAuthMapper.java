@@ -23,4 +23,20 @@ public interface RoleAuthMapper {
     void delAcctRoles(Map<String, Object> insertMap);
 
     List<String> findRoleNameById(List<String> diffList);
+
+    List<Map<String, Object>> getAllAuth();
+
+    int updAuthState(Map<String, Object> param);
+
+    List<Map<String, Object>> getExistAuthList(Map<String, Object> map);
+
+    List<Map<String, Object>> getAssignableAuthList();
+
+    List<String> getAuthsByRoleId(Map<String, Object> map);
+
+    int addRoleAuths(Map<String, Object> insertMap);
+
+    int getAuthUseful(String param);
+
+    int delRoleAuths(Map<String, Object> insertMap);
 }
