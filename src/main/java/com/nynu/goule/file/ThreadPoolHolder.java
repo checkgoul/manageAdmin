@@ -5,7 +5,10 @@ import com.zaxxer.hikari.util.ClockSource;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
+/**
+ * @author  goule
+ * @date  2021/10/29 13:47 
+ */
 public class ThreadPoolHolder {
 
     private static ThreadPoolExecutor instance;

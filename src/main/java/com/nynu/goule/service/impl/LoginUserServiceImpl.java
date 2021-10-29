@@ -8,6 +8,8 @@ import com.nynu.goule.pojo.OperateLog;
 import com.nynu.goule.service.LoginUserService;
 import com.nynu.goule.service.OperateLogService;
 import com.nynu.goule.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import sun.misc.Cleaner;
@@ -19,6 +21,7 @@ import java.util.*;
 
 @Service
 public class LoginUserServiceImpl implements LoginUserService {
+    private final static Logger logger = LoggerFactory.getLogger(LoginUserServiceImpl.class);
 
     @Resource
     private LoginUserMapper loginUserMapper;
@@ -50,6 +53,7 @@ public class LoginUserServiceImpl implements LoginUserService {
             return result;
         }
         //统一对字母转小写处理,防止对比失败
+        logger.info("获取到的验证码为：{}" ,verification1);
         String verification = verification1.toLowerCase();
         String checkCode = checkCode1.toLowerCase();
         if (!(checkCode.equals(verification))) {
