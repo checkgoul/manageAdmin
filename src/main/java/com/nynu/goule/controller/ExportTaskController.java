@@ -2,7 +2,6 @@ package com.nynu.goule.controller;
 
 import com.nynu.goule.common.BaseController;
 import com.nynu.goule.common.Result;
-import com.nynu.goule.file.ThreadPoolHolder;
 import com.nynu.goule.service.LoginUserService;
 import com.nynu.goule.thread.UserInfoExport;
 import org.springframework.web.bind.annotation.RequestMapping;
